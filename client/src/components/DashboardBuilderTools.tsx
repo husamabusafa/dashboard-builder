@@ -12,15 +12,15 @@ import type {
   MetricCardData,
   GaugeData,
   HeatmapData,
-} from './types';
-import { DataFetcher } from './dataFetcher';
+} from '../types/types';
+import { DataFetcher } from '../utils/dataFetcher';
 import {
   isValidGridArea,
   isGridAreaOccupied,
   validateGridLayout,
   getGridStats,
   extractGridAreas
-} from './gridUtils';
+} from '../utils/gridUtils';
 
 // Helper: Parse JSONPath and navigate to value
 

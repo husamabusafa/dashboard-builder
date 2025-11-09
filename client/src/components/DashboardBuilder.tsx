@@ -3,10 +3,10 @@ import { HsafaProvider } from '@hsafa/ui-sdk';
 import { useHsafa } from '@hsafa/ui-sdk';
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
 import { createDashboardTools } from './DashboardBuilderTools';
-import type { DashboardState } from './types';
+import type { DashboardState } from '../types/types';
 import { ComponentRenderer } from './ComponentRenderer';
 import { EmptyGridArea } from './EmptyGridArea';
-import { saveDashboardVersion, loadLatestDashboard, loadDashboardVersion, hasVersion } from './opfs';
+import { saveDashboardVersion, loadLatestDashboard, loadDashboardVersion, hasVersion } from '../utils/opfs';
 
 const EMPTY_DASHBOARD: DashboardState = {
   grid: {
@@ -27,7 +27,7 @@ const AGENT_ID = 'cmhijn9sv0007qggw7c4ipwm3';
 
 export default function DashboardBuilder() {
   return (
-    <HsafaProvider>
+    <HsafaProvider baseUrl="http://localhost:3900">
       <ContentContainer>
         <DashboardContent />
       </ContentContainer>

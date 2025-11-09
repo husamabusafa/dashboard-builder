@@ -46,7 +46,7 @@ All client files have been successfully restored! ✅
 
 - **Server Port**: Changed from 3001 to **2100** (as per your update)
 - **Database**: `postgres://postgres:postgres@localhost:5432/AI-commerce`
-- **Client Port**: 5173 (default Vite)
+- **Client Port**: 2200 (custom Vite port)
 
 ## Next Steps
 
@@ -61,13 +61,12 @@ npm run dev
 ```bash
 cd client
 npm run dev
-# Client runs on http://localhost:5173
+# Client runs on http://localhost:2200
 ```
 
 ### 3. Test the Integration
-- Open your browser to http://localhost:5173
+- Open your browser to http://localhost:2200
 - Open the browser console (F12)
-- You should see:
   - "Data from PostgreSQL:" - General data fetch
   - "Custom Query - Tables:" - Custom query results
 

@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactECharts from 'echarts-for-react';
-import type { DashboardComponent } from './types';
+import type { DashboardComponent } from '../types/types';
 
 interface ComponentRendererProps {
   component: DashboardComponent;
