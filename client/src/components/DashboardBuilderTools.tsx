@@ -113,6 +113,45 @@ export const createDashboardTools = (
     graphqlEndpoint: '/graphql',
   });
 
+  // Theme helpers
+  const applyChartTheme = (opt: any) => {
+    if (!opt || typeof opt !== 'object') return opt;
+    const palette = ['#6366F1', '#8B5CF6', '#A78BFA', '#22D3EE', '#F472B6', '#34D399'];
+    return {
+      color: opt.color || palette,
+      backgroundColor: opt.backgroundColor || 'transparent',
+      textStyle: { color: '#DDD', ...(opt.textStyle || {}) },
+      xAxis: Array.isArray(opt.xAxis)
+        ? opt.xAxis.map((x: any) => ({
+            axisLine: { lineStyle: { color: '#2A2C33' } },
+            axisLabel: { color: '#AAA' },
+            splitLine: { show: true, lineStyle: { color: '#1F1F1F' } },
+            ...x,
+          }))
+        : {
+            axisLine: { lineStyle: { color: '#2A2C33' } },
+            axisLabel: { color: '#AAA' },
+            splitLine: { show: true, lineStyle: { color: '#1F1F1F' } },
+            ...(opt.xAxis || {}),
+          },
+      yAxis: Array.isArray(opt.yAxis)
+        ? opt.yAxis.map((y: any) => ({
+            axisLine: { lineStyle: { color: '#2A2C33' } },
+            axisLabel: { color: '#AAA' },
+            splitLine: { show: true, lineStyle: { color: '#1F1F1F' } },
+            ...y,
+          }))
+        : {
+            axisLine: { lineStyle: { color: '#2A2C33' } },
+            axisLabel: { color: '#AAA' },
+            splitLine: { show: true, lineStyle: { color: '#1F1F1F' } },
+            ...(opt.yAxis || {}),
+          },
+      grid: { containLabel: true, ...(opt.grid || {}) },
+      ...opt,
+    };
+  };
+
   return {
     // ========================================================================
     // Dashboard State Management
@@ -265,6 +304,28 @@ export const createDashboardTools = (
           };
         }
 
+        // Default theme styles
+        const themeStyle = {
+          backgroundColor: '#17181C',
+          borderColor: '#2A2C33',
+          borderRadius: '12px',
+          padding: params.type === 'stat-card' ? '20px' : '16px',
+          ...(params.type === 'chart' ? { minHeight: '250px' } : {}),
+        } as DashboardComponent['style'];
+
+        // Apply theme to provided data
+        let themedData = params.data;
+        if (params.type === 'stat-card') {
+          const d = (params.data || {}) as any;
+          themedData = {
+            color: d.color || '#FFFFFF',
+            icon: d.icon || 'lucide:sparkles',
+            ...d,
+          };
+        } else if (params.type === 'chart' && params.data && !params.query) {
+          themedData = applyChartTheme(params.data);
+        }
+
         // Create component with initial data
         const newComponent: DashboardComponent = {
           id: params.id,
@@ -272,9 +333,9 @@ export const createDashboardTools = (
           gridArea: params.gridArea,
           title: params.title,
           description: params.description,
-          data: params.data,
+          data: themedData,
           dataConfig: finalDataConfig,
-          style: params.style,
+          style: { ...(themeStyle || {}), ...(params.style || {}) },
           metadata: {
             createdAt: new Date().toISOString(),
             fetchStatus: 'idle',
@@ -295,14 +356,15 @@ export const createDashboardTools = (
           try {
             const traceResult = await dataFetcher.fetchDataWithTrace(params.id, finalDataConfig);
             const normalized = params.type === 'chart' ? normalizeToEChartsOption(traceResult.final) : traceResult.final;
-            lastTraceResult = { ...traceResult, final: normalized } as any;
+            const themed = params.type === 'chart' ? applyChartTheme(normalized) : normalized;
+            lastTraceResult = { ...traceResult, final: themed } as any;
             setDashboardState(prev => ({
               ...prev,
               components: {
                 ...prev.components,
                 [params.id]: {
                   ...prev.components[params.id],
-                  data: normalized,
+                  data: themed,
                   metadata: {
                     ...prev.components[params.id].metadata,
                     fetchStatus: traceResult.error ? 'error' : 'success',

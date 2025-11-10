@@ -1,0 +1,852 @@
+{
+  "version": "1.0.0",
+  "exportDate": "2025-11-10T21:11:53.576Z",
+  "agent": {
+    "id": "cmhijn9sv0007qggw7c4ipwm3",
+    "name": "Chart Builder",
+    "description": null,
+    "type": null,
+    "color": "#EF4444",
+    "icon": "tool",
+    "nodePositionX": 300,
+    "nodePositionY": 200,
+    "nodeData": {
+      "id": "cmhijn9sv0007qggw7c4ipwm3",
+      "label": "Chart Builder",
+      "subtitle": "AI Agent",
+      "status": "offline",
+      "description": null,
+      "icon": "tool",
+      "color": "#EF4444",
+      "toolsCount": 0,
+      "componentsCount": 0,
+      "mcpCount": 0,
+      "knowledgeBaseCount": 0,
+      "configNodesCount": 3,
+      "toolNodesCount": 6
+    }
+  },
+  "nodes": [
+    {
+      "nodeId": "imported_1762780205839_0",
+      "nodeType": "model",
+      "label": "model",
+      "positionX": 300,
+      "positionY": -60,
+      "data": {
+        "isConfigured": true,
+        "isExpanded": false,
+        "agentColor": "#EF4444",
+        "modelName": "gpt-5",
+        "apiKeyValue": "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",
+        "provider": "openai",
+        "apiKeyVariablesMode": false,
+        "providerVariablesMode": false,
+        "label": "model"
+      }
+    },
+    {
+      "nodeId": "imported_1762780205839_1",
+      "nodeType": "system_prompt",
+      "label": "system_prompt",
+      "positionX": -100,
+      "positionY": -60,
+      "data": {
+        "systemPrompt": "You are a Dashboard Builder AI assistant. Create interactive dashboards with grid layouts and three component types: charts, tables, and stat cards.\n\nTheme: use a modern purple theme by default. Tokens: primary=#6366F1, accent=#8B5CF6, bg=#17181C, border=#2A2C33. Component container: borderRadius=12px, padding=16px (stat-card 20px). Charts must have minHeight=250px. Prefer neutral text #DDD, secondary #AAA.\n\nIcons: always use Iconify icon names (e.g., 'lucide:users', 'lucide:dollar-sign') for stat-card 'icon' and for any column 'icon' in tables. Do not use emojis.\n\nComponent Types:\n1. chart - ECharts visualizations (line, bar, pie, scatter, radar, gauge, heatmap, etc.)\n2. table - Data tables with columns and rows\n3. stat-card - KPI cards showing single metrics (value, label, icon, trend)\n\nDefaults you should apply when creating components (the client also enforces these):\n- Container style: bg=#17181C, border=#2A2C33, radius=12px, padding=16px (stat-card 20px)\n- Chart palette: ['#6366F1','#8B5CF6','#A78BFA','#22D3EE','#F472B6','#34D399'] and minHeight 250px\n- Stat card: provide icon (Iconify string), color default '#FFFFFF'\n\nTwo Ways to Provide Data:\nOption A: Static Data - Provide complete data directly:\n- Chart (ECharts option): {title:{text:'Sales'}, xAxis:{type:'category', data:['Mon','Tue']}, yAxis:{type:'value'}, series:[{type:'line', data:[120,200]}]}\n- Table: {columns:[{key:'name',label:'Name'}], rows:[{name:'John'}]}\n- Stat Card: {value:1234, label:'Total Users', icon:'lucide:users', trend:{value:12, direction:'up'}}\n\nOption B: PostgreSQL Query - Use 'query' to fetch live data and transform via Handlebars/AlaSQL:\n```javascript\n{\n  id:'sales_chart',\n  type:'chart',\n  gridArea:'main',\n  title:'Monthly Sales',\n  data:{},\n  query:{\n    sql:'SELECT month, revenue FROM sales ORDER BY month',\n    handlebarsTemplate:'{\"xAxis\":{\"type\":\"category\",\"data\":[{{#each data}}\"{{month}}\"{{#unless @last}},{{/unless}}{{/each}}]},\"yAxis\":{\"type\":\"value\"},\"series\":[{\"type\":\"bar\",\"data\":[{{#each data}}{{revenue}}{{#unless @last}},{{/unless}}{{/each}}]}]}'\n  }\n}\n```\n\nHandlebars Template Examples:\nFor ECharts:\n```\n{\"xAxis\":{\"data\":[{{#each data}}\"{{category}}\"{{#unless @last}},{{/unless}}{{/each}}]},\"series\":[{\"data\":[{{#each data}}{{value}}{{#unless @last}},{{/unless}}{{/each}}]}]}\n```\nFor Table:\n```\n{\"columns\":[{\"key\":\"name\",\"label\":\"Name\"},{\"key\":\"value\",\"label\":\"Value\"}],\"rows\":[{{#each data}}{\"name\":\"{{name}}\",\"value\":{{value}}}{{#unless @last}},{{/unless}}{{/each}}]}\n```\nFor Stat Card:\n```\n{\"value\":{{data.0.total}},\"label\":\"Total Sales\",\"icon\":\"lucide:badge-dollar-sign\",\"trend\":{\"value\":8.2,\"direction\":\"up\"}}\n```\n\n**Advanced Editing:**\n- push: Add to arrays (e.g., add data points)\n- splice: Remove/replace in arrays\n- merge: Deep merge objects\n- JSONPath: path='data.series[0].data'\n\n**Workflow:**\n1. Set grid layout with set_grid_layout\n2. Create components (static data OR query)\n3. Update with update_component\n\nUse dark theme colors. PostgreSQL available via MCP.",
+        "isConfigured": true,
+        "isExpanded": false,
+        "variablesMode": false,
+        "agentColor": "#EF4444",
+        "label": "system_prompt"
+      }
+    },
+    {
+      "nodeId": "imported_1762780205839_2",
+      "nodeType": "prompt",
+      "label": "prompt",
+      "positionX": 700,
+      "positionY": -60,
+      "data": {
+        "prompt": "{{prompt}}",
+        "isConfigured": true,
+        "isExpanded": false,
+        "variablesMode": true,
+        "agentColor": "#EF4444",
+        "label": "prompt"
+      }
+    },
+    {
+      "nodeId": "imported_1762780205839_3",
+      "nodeType": "tool_custom_frontend",
+      "label": "Get Dashboard",
+      "positionX": 300,
+      "positionY": 600,
+      "data": {
+        "agentColor": "#EF4444",
+        "isExpanded": false,
+        "isConfigured": true,
+        "label": "Get Dashboard",
+        "color": "#6366F1",
+        "type": "frontend",
+        "toolTitle": "get_dashboard",
+        "toolDescription": "Retrieve the complete current dashboard state including grid layout configuration and all components. Use this to understand what's currently in the dashboard before making changes.",
+        "customToolZodSchema": "z.object({})"
+      }
+    },
+    {
+      "nodeId": "imported_1762780205839_4",
+      "nodeType": "tool_custom_frontend",
+      "label": "Set Grid Layout",
+      "positionX": -100,
+      "positionY": 600,
+      "data": {
+        "agentColor": "#EF4444",
+        "isExpanded": false,
+        "isConfigured": true,
+        "label": "Set Grid Layout",
+        "color": "#6366F1",
+        "type": "frontend",
+        "toolTitle": "set_grid_layout",
+        "toolDescription": "Configure the dashboard grid layout including columns, rows, gap, and template areas. Template areas define named grid regions where components can be placed.",
+        "customToolZodSchema": "z.object({columns: z.string().describe('CSS grid columns like 1fr 1fr 1fr'), rows: z.string().describe('CSS grid rows like auto 1fr 1fr'), gap: z.string().describe('Gap like 16px or 1rem'), templateAreas: z.array(z.string()).describe('Grid template areas array')})"
+      }
+    },
+    {
+      "nodeId": "imported_1762780205839_5",
+      "nodeType": "tool_custom_frontend",
+      "label": "Create Component",
+      "positionX": 100,
+      "positionY": 800,
+      "data": {
+        "agentColor": "#EF4444",
+        "isExpanded": false,
+        "isConfigured": true,
+        "label": "Create Component",
+        "color": "#6366F1",
+        "type": "frontend",
+        "toolTitle": "create_component",
+        "toolDescription": "Create a new dashboard component. Supports three types: chart (ECharts), table, or stat-card. You can provide static data OR use the query parameter to fetch live data from PostgreSQL with Handlebars/AlaSQL transformations. When a query/dataConfig is provided, this tool attempts a data fetch and returns both the raw PostgreSQL response and the final processed data (what the component renders), along with any errors.",
+        "customToolZodSchema": "z.object({id: z.string().describe('Unique component ID like sales_chart or user_table'), type: z.enum(['chart', 'table', 'stat-card']).describe('Component type: chart (ECharts), table (data table), or stat-card (KPI card)'), gridArea: z.string().describe('Grid area name from layout'), title: z.string().optional().describe('Optional component title'), description: z.string().optional().describe('Optional description'), data: z.any().describe('Component data: ECharts options for chart, {columns, rows} for table, {value, label, trend} for stat-card. Can be empty {} if using query'), query: z.object({sql: z.string().describe('PostgreSQL query to fetch data'), handlebarsTemplate: z.string().optional().describe('Handlebars template to transform query results into component data format'), alasqlTransform: z.string().optional().describe('AlaSQL query to further transform data')}).optional().describe('Optional: Fetch data from PostgreSQL and transform with Handlebars/AlaSQL'), style: z.any().optional().describe('Custom container styles')})"
+      }
+    },
+    {
+      "nodeId": "imported_1762780205839_6",
+      "nodeType": "tool_custom_frontend",
+      "label": "Update Component",
+      "positionX": 500,
+      "positionY": 800,
+      "data": {
+        "agentColor": "#EF4444",
+        "isExpanded": false,
+        "isConfigured": true,
+        "label": "Update Component",
+        "color": "#6366F1",
+        "type": "frontend",
+        "toolTitle": "update_component",
+        "toolDescription": "Update an existing component with advanced operations. Supports: set (replace value), push (add to array), splice (remove/replace in array), merge (deep merge objects). Use path for nested updates like data.series[0].data. If the update includes a dataConfig or query, this tool attempts a data fetch and returns both the raw PostgreSQL response and the final processed data (what the component renders), along with any errors.",
+        "customToolZodSchema": "z.object({id: z.string().describe('Component ID to update'), path: z.string().optional().describe('JSONPath for nested updates like data.series[0].data'), updates: z.any().optional().describe('New value or data to apply'), operation: z.enum(['set', 'push', 'splice', 'merge']).optional().default('set').describe('Operation: set=replace, push=add to array, splice=remove from array, merge=deep merge'), operationParams: z.any().optional().describe('Extra params for splice: {start, deleteCount, items}')})"
+      }
+    },
+    {
+      "nodeId": "imported_1762780205839_7",
+      "nodeType": "tool_custom_frontend",
+      "label": "Remove Component",
+      "positionX": 700,
+      "positionY": 600,
+      "data": {
+        "agentColor": "#EF4444",
+        "isExpanded": false,
+        "isConfigured": true,
+        "label": "Remove Component",
+        "color": "#6366F1",
+        "type": "frontend",
+        "toolTitle": "remove_component",
+        "toolDescription": "Remove a component from the dashboard by its ID. The component will be completely deleted from the dashboard state.",
+        "customToolZodSchema": "z.object({id: z.string().describe('ID of the component to remove')})"
+      }
+    },
+    {
+      "nodeId": "imported_1762780205839_8",
+      "nodeType": "tool_custom_frontend",
+      "label": "Get Component",
+      "positionX": 100,
+      "positionY": 1000,
+      "data": {
+        "agentColor": "#EF4444",
+        "isExpanded": false,
+        "isConfigured": true,
+        "label": "Get Component",
+        "color": "#6366F1",
+        "type": "frontend",
+        "toolTitle": "get_component",
+        "toolDescription": "Retrieve a specific component's full configuration by its ID. Returns the component's type, title, data, config, and grid area placement.",
+        "customToolZodSchema": "z.object({id: z.string().describe('ID of the component to retrieve')})"
+      }
+    },
+    {
+      "nodeId": "imported_1762780205839_9",
+      "nodeType": "mcp_postgresql",
+      "label": "PostgreSQL",
+      "positionX": 502.8626475879041,
+      "positionY": 1096.275846002866,
+      "data": {
+        "agentColor": "#EF4444",
+        "isExpanded": false,
+        "isConfigured": false,
+        "label": "PostgreSQL",
+        "color": "#EF4444",
+        "type": "mcp",
+        "selectedPreset": "postgresql",
+        "mcpUrl": "postgres://postgres:postgres@localhost:5432/dashboard-builder",
+        "mcpAuth": "",
+        "mcpTransport": "http",
+        "mcpCommand": "",
+        "mcpArgs": [],
+        "variablesMode": false,
+        "mcpTools": [],
+        "deactivatedTools": [],
+        "description": "",
+        "connectionStatus": "connecting",
+        "toolsPositionState": "collapsed"
+      }
+    },
+    {
+      "nodeId": "imported_1762780205839_9-tool-list_schemas",
+      "nodeType": "mcpTool",
+      "label": "list_schemas",
+      "positionX": -37.64569091333729,
+      "positionY": 1288.7460134430876,
+      "data": {
+        "label": "list_schemas",
+        "description": "List all schemas in the database",
+        "inputSchema": {
+          "jsonSchema": {
+            "type": "object",
+            "properties": {},
+            "title": "list_schemasArguments",
+            "additionalProperties": false
+          }
+        },
+        "mcpParent": "imported_1762780205839_9",
+        "isMcpTool": true,
+        "isDeactivated": false,
+        "agentColor": "#EF4444",
+        "mcpColor": "#EF4444"
+      }
+    },
+    {
+      "nodeId": "imported_1762780205839_9-tool-list_objects",
+      "nodeType": "mcpTool",
+      "label": "list_objects",
+      "positionX": 182.35430908666274,
+      "positionY": 1288.7460134430876,
+      "data": {
+        "label": "list_objects",
+        "description": "List objects in a schema",
+        "inputSchema": {
+          "jsonSchema": {
+            "type": "object",
+            "properties": {
+              "schema_name": {
+                "description": "Schema name",
+                "title": "Schema Name",
+                "type": "string"
+              },
+              "object_type": {
+                "default": "table",
+                "description": "Object type: 'table', 'view', 'sequence', or 'extension'",
+                "title": "Object Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "schema_name"
+            ],
+            "title": "list_objectsArguments",
+            "additionalProperties": false
+          }
+        },
+        "mcpParent": "imported_1762780205839_9",
+        "isMcpTool": true,
+        "isDeactivated": false,
+        "agentColor": "#EF4444",
+        "mcpColor": "#EF4444"
+      }
+    },
+    {
+      "nodeId": "imported_1762780205839_9-tool-get_object_details",
+      "nodeType": "mcpTool",
+      "label": "get_object_details",
+      "positionX": 402.35430908666274,
+      "positionY": 1288.7460134430876,
+      "data": {
+        "label": "get_object_details",
+        "description": "Show detailed information about a database object",
+        "inputSchema": {
+          "jsonSchema": {
+            "type": "object",
+            "properties": {
+              "schema_name": {
+                "description": "Schema name",
+                "title": "Schema Name",
+                "type": "string"
+              },
+              "object_name": {
+                "description": "Object name",
+                "title": "Object Name",
+                "type": "string"
+              },
+              "object_type": {
+                "default": "table",
+                "description": "Object type: 'table', 'view', 'sequence', or 'extension'",
+                "title": "Object Type",
+                "type": "string"
+              }
+            },
+            "required": [
+              "schema_name",
+              "object_name"
+            ],
+            "title": "get_object_detailsArguments",
+            "additionalProperties": false
+          }
+        },
+        "mcpParent": "imported_1762780205839_9",
+        "isMcpTool": true,
+        "isDeactivated": false,
+        "agentColor": "#EF4444",
+        "mcpColor": "#EF4444"
+      }
+    },
+    {
+      "nodeId": "imported_1762780205839_9-tool-explain_query",
+      "nodeType": "mcpTool",
+      "label": "explain_query",
+      "positionX": 622.3543090866627,
+      "positionY": 1288.7460134430876,
+      "data": {
+        "label": "explain_query",
+        "description": "Explains the execution plan for a SQL query, showing how the database will execute it and provides detailed cost estimates.",
+        "inputSchema": {
+          "jsonSchema": {
+            "type": "object",
+            "properties": {
+              "sql": {
+                "description": "SQL query to explain",
+                "title": "Sql",
+                "type": "string"
+              },
+              "analyze": {
+                "default": false,
+                "description": "When True, actually runs the query to show real execution statistics instead of estimates. Takes longer but provides more accurate information.",
+                "title": "Analyze",
+                "type": "boolean"
+              },
+              "hypothetical_indexes": {
+                "default": [],
+                "description": "A list of hypothetical indexes to simulate. Each index must be a dictionary with these keys:\n    - 'table': The table name to add the index to (e.g., 'users')\n    - 'columns': List of column names to include in the index (e.g., ['email'] or ['last_name', 'first_name'])\n    - 'using': Optional index method (default: 'btree', other options include 'hash', 'gist', etc.)\n\nExamples: [\n    {\"table\": \"users\", \"columns\": [\"email\"], \"using\": \"btree\"},\n    {\"table\": \"orders\", \"columns\": [\"user_id\", \"created_at\"]}\n]\nIf there is no hypothetical index, you can pass an empty list.",
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "title": "Hypothetical Indexes",
+                "type": "array"
+              }
+            },
+            "required": [
+              "sql"
+            ],
+            "title": "explain_queryArguments",
+            "additionalProperties": false
+          }
+        },
+        "mcpParent": "imported_1762780205839_9",
+        "isMcpTool": true,
+        "isDeactivated": false,
+        "agentColor": "#EF4444",
+        "mcpColor": "#EF4444"
+      }
+    },
+    {
+      "nodeId": "imported_1762780205839_9-tool-analyze_workload_indexes",
+      "nodeType": "mcpTool",
+      "label": "analyze_workload_indexes",
+      "positionX": 842.3543090866627,
+      "positionY": 1288.7460134430876,
+      "data": {
+        "label": "analyze_workload_indexes",
+        "description": "Analyze frequently executed queries in the database and recommend optimal indexes",
+        "inputSchema": {
+          "jsonSchema": {
+            "type": "object",
+            "properties": {
+              "max_index_size_mb": {
+                "default": 10000,
+                "description": "Max index size in MB",
+                "title": "Max Index Size Mb",
+                "type": "integer"
+              },
+              "method": {
+                "default": "dta",
+                "description": "Method to use for analysis",
+                "enum": [
+                  "dta",
+                  "llm"
+                ],
+                "title": "Method",
+                "type": "string"
+              }
+            },
+            "title": "analyze_workload_indexesArguments",
+            "additionalProperties": false
+          }
+        },
+        "mcpParent": "imported_1762780205839_9",
+        "isMcpTool": true,
+        "isDeactivated": false,
+        "agentColor": "#EF4444",
+        "mcpColor": "#EF4444"
+      }
+    },
+    {
+      "nodeId": "imported_1762780205839_9-more-tools",
+      "nodeType": "mcpTool",
+      "label": "+4 more",
+      "positionX": 1060.455976786911,
+      "positionY": 1298.237674941846,
+      "data": {
+        "label": "+4 more",
+        "tools": [
+          {
+            "name": "list_schemas",
+            "description": "List all schemas in the database",
+            "inputSchema": {
+              "jsonSchema": {
+                "type": "object",
+                "properties": {},
+                "title": "list_schemasArguments",
+                "additionalProperties": false
+              }
+            }
+          },
+          {
+            "name": "list_objects",
+            "description": "List objects in a schema",
+            "inputSchema": {
+              "jsonSchema": {
+                "type": "object",
+                "properties": {
+                  "schema_name": {
+                    "description": "Schema name",
+                    "title": "Schema Name",
+                    "type": "string"
+                  },
+                  "object_type": {
+                    "default": "table",
+                    "description": "Object type: 'table', 'view', 'sequence', or 'extension'",
+                    "title": "Object Type",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "schema_name"
+                ],
+                "title": "list_objectsArguments",
+                "additionalProperties": false
+              }
+            }
+          },
+          {
+            "name": "get_object_details",
+            "description": "Show detailed information about a database object",
+            "inputSchema": {
+              "jsonSchema": {
+                "type": "object",
+                "properties": {
+                  "schema_name": {
+                    "description": "Schema name",
+                    "title": "Schema Name",
+                    "type": "string"
+                  },
+                  "object_name": {
+                    "description": "Object name",
+                    "title": "Object Name",
+                    "type": "string"
+                  },
+                  "object_type": {
+                    "default": "table",
+                    "description": "Object type: 'table', 'view', 'sequence', or 'extension'",
+                    "title": "Object Type",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "schema_name",
+                  "object_name"
+                ],
+                "title": "get_object_detailsArguments",
+                "additionalProperties": false
+              }
+            }
+          },
+          {
+            "name": "explain_query",
+            "description": "Explains the execution plan for a SQL query, showing how the database will execute it and provides detailed cost estimates.",
+            "inputSchema": {
+              "jsonSchema": {
+                "type": "object",
+                "properties": {
+                  "sql": {
+                    "description": "SQL query to explain",
+                    "title": "Sql",
+                    "type": "string"
+                  },
+                  "analyze": {
+                    "default": false,
+                    "description": "When True, actually runs the query to show real execution statistics instead of estimates. Takes longer but provides more accurate information.",
+                    "title": "Analyze",
+                    "type": "boolean"
+                  },
+                  "hypothetical_indexes": {
+                    "default": [],
+                    "description": "A list of hypothetical indexes to simulate. Each index must be a dictionary with these keys:\n    - 'table': The table name to add the index to (e.g., 'users')\n    - 'columns': List of column names to include in the index (e.g., ['email'] or ['last_name', 'first_name'])\n    - 'using': Optional index method (default: 'btree', other options include 'hash', 'gist', etc.)\n\nExamples: [\n    {\"table\": \"users\", \"columns\": [\"email\"], \"using\": \"btree\"},\n    {\"table\": \"orders\", \"columns\": [\"user_id\", \"created_at\"]}\n]\nIf there is no hypothetical index, you can pass an empty list.",
+                    "items": {
+                      "additionalProperties": true,
+                      "type": "object"
+                    },
+                    "title": "Hypothetical Indexes",
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "sql"
+                ],
+                "title": "explain_queryArguments",
+                "additionalProperties": false
+              }
+            }
+          },
+          {
+            "name": "analyze_workload_indexes",
+            "description": "Analyze frequently executed queries in the database and recommend optimal indexes",
+            "inputSchema": {
+              "jsonSchema": {
+                "type": "object",
+                "properties": {
+                  "max_index_size_mb": {
+                    "default": 10000,
+                    "description": "Max index size in MB",
+                    "title": "Max Index Size Mb",
+                    "type": "integer"
+                  },
+                  "method": {
+                    "default": "dta",
+                    "description": "Method to use for analysis",
+                    "enum": [
+                      "dta",
+                      "llm"
+                    ],
+                    "title": "Method",
+                    "type": "string"
+                  }
+                },
+                "title": "analyze_workload_indexesArguments",
+                "additionalProperties": false
+              }
+            }
+          },
+          {
+            "name": "analyze_query_indexes",
+            "description": "Analyze a list of (up to 10) SQL queries and recommend optimal indexes",
+            "inputSchema": {
+              "jsonSchema": {
+                "type": "object",
+                "properties": {
+                  "queries": {
+                    "description": "List of Query strings to analyze",
+                    "items": {
+                      "type": "string"
+                    },
+                    "title": "Queries",
+                    "type": "array"
+                  },
+                  "max_index_size_mb": {
+                    "default": 10000,
+                    "description": "Max index size in MB",
+                    "title": "Max Index Size Mb",
+                    "type": "integer"
+                  },
+                  "method": {
+                    "default": "dta",
+                    "description": "Method to use for analysis",
+                    "enum": [
+                      "dta",
+                      "llm"
+                    ],
+                    "title": "Method",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "queries"
+                ],
+                "title": "analyze_query_indexesArguments",
+                "additionalProperties": false
+              }
+            }
+          },
+          {
+            "name": "analyze_db_health",
+            "description": "Analyzes database health. Here are the available health checks:\n- index - checks for invalid, duplicate, and bloated indexes\n- connection - checks the number of connection and their utilization\n- vacuum - checks vacuum health for transaction id wraparound\n- sequence - checks sequences at risk of exceeding their maximum value\n- replication - checks replication health including lag and slots\n- buffer - checks for buffer cache hit rates for indexes and tables\n- constraint - checks for invalid constraints\n- all - runs all checks\nYou can optionally specify a single health check or a comma-separated list of health checks. The default is 'all' checks.",
+            "inputSchema": {
+              "jsonSchema": {
+                "type": "object",
+                "properties": {
+                  "health_type": {
+                    "default": "all",
+                    "description": "Optional. Valid values are: all, buffer, connection, constraint, index, replication, sequence, vacuum.",
+                    "title": "Health Type",
+                    "type": "string"
+                  }
+                },
+                "title": "analyze_db_healthArguments",
+                "additionalProperties": false
+              }
+            }
+          },
+          {
+            "name": "get_top_queries",
+            "description": "Reports the slowest or most resource-intensive queries using data from the 'pg_stat_statements' extension.",
+            "inputSchema": {
+              "jsonSchema": {
+                "type": "object",
+                "properties": {
+                  "sort_by": {
+                    "default": "resources",
+                    "description": "Ranking criteria: 'total_time' for total execution time or 'mean_time' for mean execution time per call, or 'resources' for resource-intensive queries",
+                    "title": "Sort By",
+                    "type": "string"
+                  },
+                  "limit": {
+                    "default": 10,
+                    "description": "Number of queries to return when ranking based on mean_time or total_time",
+                    "title": "Limit",
+                    "type": "integer"
+                  }
+                },
+                "title": "get_top_queriesArguments",
+                "additionalProperties": false
+              }
+            }
+          },
+          {
+            "name": "execute_sql",
+            "description": "Execute any SQL query",
+            "inputSchema": {
+              "jsonSchema": {
+                "type": "object",
+                "properties": {
+                  "sql": {
+                    "default": "all",
+                    "description": "SQL to run",
+                    "title": "Sql",
+                    "type": "string"
+                  }
+                },
+                "title": "execute_sqlArguments",
+                "additionalProperties": false
+              }
+            }
+          }
+        ],
+        "description": "View all 9 tools",
+        "mcpParent": "imported_1762780205839_9",
+        "isMoreToolsNode": true,
+        "totalToolsCount": 9,
+        "agentColor": "#EF4444",
+        "mcpColor": "#EF4444"
+      }
+    },
+    {
+      "nodeId": "main-agent",
+      "nodeType": "agent",
+      "label": "Chart Builder",
+      "positionX": 300,
+      "positionY": 200,
+      "data": {
+        "id": "cmhijn9sv0007qggw7c4ipwm3",
+        "label": "Chart Builder",
+        "subtitle": "AI Agent",
+        "status": "offline",
+        "description": null,
+        "icon": "tool",
+        "color": "#EF4444",
+        "toolsCount": 0,
+        "componentsCount": 0,
+        "mcpCount": 0,
+        "knowledgeBaseCount": 0,
+        "configNodesCount": 3,
+        "toolNodesCount": 6
+      }
+    }
+  ],
+  "edges": [
+    {
+      "edgeId": "edge_1762780205839_l769yn6i2",
+      "sourceId": "imported_1762780205839_0",
+      "targetId": "main-agent",
+      "targetHandle": "config",
+      "edgeType": "custom"
+    },
+    {
+      "edgeId": "edge_1762780205839_59xbufdxn",
+      "sourceId": "imported_1762780205839_1",
+      "targetId": "main-agent",
+      "targetHandle": "config",
+      "edgeType": "custom"
+    },
+    {
+      "edgeId": "edge_1762780205839_nfgbpt8b7",
+      "sourceId": "imported_1762780205839_2",
+      "targetId": "main-agent",
+      "targetHandle": "config",
+      "edgeType": "custom"
+    },
+    {
+      "edgeId": "edge_1762780205839_9j5ajdrp8",
+      "sourceId": "imported_1762780205839_4",
+      "targetId": "main-agent",
+      "targetHandle": "features",
+      "edgeType": "custom"
+    },
+    {
+      "edgeId": "edge_1762780205839_cvbjebmfp",
+      "sourceId": "imported_1762780205839_3",
+      "targetId": "main-agent",
+      "targetHandle": "features",
+      "edgeType": "custom"
+    },
+    {
+      "edgeId": "edge_1762780205839_pkxtar6al",
+      "sourceId": "imported_1762780205839_8",
+      "targetId": "main-agent",
+      "targetHandle": "features",
+      "edgeType": "custom"
+    },
+    {
+      "edgeId": "edge_1762780205839_91zbtyhct",
+      "sourceId": "imported_1762780205839_7",
+      "targetId": "main-agent",
+      "targetHandle": "features",
+      "edgeType": "custom"
+    },
+    {
+      "edgeId": "edge_1762780205839_9092id1i4",
+      "sourceId": "imported_1762780205839_5",
+      "targetId": "main-agent",
+      "targetHandle": "features",
+      "edgeType": "custom"
+    },
+    {
+      "edgeId": "edge_1762780205839_cduue29v9",
+      "sourceId": "imported_1762780205839_6",
+      "targetId": "main-agent",
+      "targetHandle": "features",
+      "edgeType": "custom"
+    },
+    {
+      "edgeId": "edge_1762780205839_jk30w7958",
+      "sourceId": "imported_1762780205839_9",
+      "targetId": "main-agent",
+      "targetHandle": "features",
+      "edgeType": "custom"
+    },
+    {
+      "edgeId": "imported_1762780205839_9-to-list_schemas",
+      "sourceId": "imported_1762780205839_9",
+      "targetId": "imported_1762780205839_9-tool-list_schemas",
+      "sourceHandle": "mcp-tools",
+      "targetHandle": "tool-input",
+      "edgeType": "default",
+      "data": {
+        "isMcpConnection": true,
+        "allowDelete": false
+      }
+    },
+    {
+      "edgeId": "imported_1762780205839_9-to-list_objects",
+      "sourceId": "imported_1762780205839_9",
+      "targetId": "imported_1762780205839_9-tool-list_objects",
+      "sourceHandle": "mcp-tools",
+      "targetHandle": "tool-input",
+      "edgeType": "default",
+      "data": {
+        "isMcpConnection": true,
+        "allowDelete": false
+      }
+    },
+    {
+      "edgeId": "imported_1762780205839_9-to-get_object_details",
+      "sourceId": "imported_1762780205839_9",
+      "targetId": "imported_1762780205839_9-tool-get_object_details",
+      "sourceHandle": "mcp-tools",
+      "targetHandle": "tool-input",
+      "edgeType": "default",
+      "data": {
+        "isMcpConnection": true,
+        "allowDelete": false
+      }
+    },
+    {
+      "edgeId": "imported_1762780205839_9-to-explain_query",
+      "sourceId": "imported_1762780205839_9",
+      "targetId": "imported_1762780205839_9-tool-explain_query",
+      "sourceHandle": "mcp-tools",
+      "targetHandle": "tool-input",
+      "edgeType": "default",
+      "data": {
+        "isMcpConnection": true,
+        "allowDelete": false
+      }
+    },
+    {
+      "edgeId": "imported_1762780205839_9-to-analyze_workload_indexes",
+      "sourceId": "imported_1762780205839_9",
+      "targetId": "imported_1762780205839_9-tool-analyze_workload_indexes",
+      "sourceHandle": "mcp-tools",
+      "targetHandle": "tool-input",
+      "edgeType": "default",
+      "data": {
+        "isMcpConnection": true,
+        "allowDelete": false
+      }
+    },
+    {
+      "edgeId": "imported_1762780205839_9-to-tools",
+      "sourceId": "imported_1762780205839_9",
+      "targetId": "imported_1762780205839_9-more-tools",
+      "sourceHandle": "mcp-tools",
+      "targetHandle": "tool-input",
+      "edgeType": "default",
+      "data": {
+        "isMcpConnection": true,
+        "allowDelete": false
+      }
+    }
+  ],
+  "metadata": {
+    "totalNodes": 17,
+    "totalSystemNodes": 16,
+    "totalEdges": 16,
+    "nodeTypes": [
+      "model",
+      "system_prompt",
+      "prompt",
+      "tool_custom_frontend",
+      "mcp_postgresql",
+      "mcpTool",
+      "agent"
+    ],
+    "hasAgentNode": true
+  }
+}

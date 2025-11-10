@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactECharts from 'echarts-for-react';
+import { Icon } from '@iconify/react';
 import type { DashboardComponent, TableData, StatCardData } from '../types/types';
 
 interface ComponentRendererProps {
@@ -28,7 +29,7 @@ export const ComponentRenderer: React.FC<ComponentRendererProps> = ({ component 
         return component.data ? (
           <ReactECharts
             option={component.data}
-            style={{ height: '100%', width: '100%' }}
+            style={{ height: '100%', width: '100%', minHeight: '250px' }}
             opts={{ renderer: 'canvas' }}
           />
         ) : (
@@ -51,21 +52,26 @@ export const ComponentRenderer: React.FC<ComponentRendererProps> = ({ component 
           <div style={{ overflowX: 'auto', flex: 1 }}>
             <table style={{ 
               width: '100%', 
-              borderCollapse: 'collapse',
+              borderCollapse: 'separate',
+              borderSpacing: 0,
               fontSize: '13px'
             }}>
               <thead>
-                <tr style={{ borderBottom: '1px solid #2A2C33' }}>
+                <tr style={{ 
+                  borderBottom: '2px solid #2A2C33',
+                  background: 'linear-gradient(to bottom, rgba(99, 102, 241, 0.05), transparent)'
+                }}>
                   {tableData.columns.map((col) => (
                     <th
                       key={col.key}
                       style={{
                         textAlign: col.align || 'left',
-                        padding: '12px 8px',
-                        color: '#999',
+                        padding: '14px 12px',
+                        color: '#AAA',
                         fontWeight: 600,
                         fontSize: '12px',
                         textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
                       }}
                     >
                       {col.label}
@@ -79,15 +85,19 @@ export const ComponentRenderer: React.FC<ComponentRendererProps> = ({ component 
                     key={rowIndex}
                     style={{
                       borderBottom: '1px solid #1F1F1F',
+                      transition: 'background-color 0.15s ease',
                     }}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(99, 102, 241, 0.05)'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                   >
                     {tableData.columns.map((col) => (
                       <td
                         key={col.key}
                         style={{
-                          padding: '12px 8px',
+                          padding: '14px 12px',
                           textAlign: col.align || 'left',
-                          color: col.color || '#CCC',
+                          color: col.color || '#DDD',
+                          fontSize: '13px',
                         }}
                       >
                         {col.format ? col.format(row[col.key]) : row[col.key]}
@@ -111,62 +121,97 @@ export const ComponentRenderer: React.FC<ComponentRendererProps> = ({ component 
           );
         }
 
+        const accent = statData.iconColor || statData.color || '#6366F1';
+        const chipBg = `linear-gradient(135deg, ${accent}33, ${accent}1A)`; // 20% and 10% alpha
+
         return (
           <div style={{ 
             display: 'flex', 
             flexDirection: 'column',
-            justifyContent: 'center',
+            justifyContent: 'space-between',
             flex: 1,
-            padding: '8px'
+            padding: 0
           }}>
-            {statData.icon && (
-              <div style={{ 
-                fontSize: '32px', 
-                marginBottom: '12px',
-                opacity: 0.9 
-              }}>
-                {statData.icon}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '12px' }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ 
+                  fontSize: '12px', 
+                  color: '#AFAFAF',
+                  marginBottom: '10px',
+                  fontWeight: 600,
+                  letterSpacing: '0.4px',
+                  textTransform: 'uppercase'
+                }}>
+                  {statData.label}
+                </div>
+                <div style={{ 
+                  fontSize: '44px', 
+                  fontWeight: 800, 
+                  color: statData.color || '#FFFFFF',
+                  marginBottom: '6px',
+                  lineHeight: 1,
+                  letterSpacing: '-0.02em'
+                }}>
+                  {statData.prefix}{statData.value}{statData.suffix}
+                </div>
               </div>
-            )}
-            <div style={{ 
-              fontSize: '36px', 
-              fontWeight: 700, 
-              color: statData.color || '#FFF',
-              marginBottom: '8px',
-              lineHeight: 1
-            }}>
-              {statData.prefix}{statData.value}{statData.suffix}
+              {statData.icon && (
+                <div style={{ 
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '60px',
+                  height: '60px',
+                  borderRadius: '14px',
+                  background: chipBg,
+                  boxShadow: `0 10px 32px ${accent}22`,
+                  border: `1px solid ${accent}33`,
+                  flexShrink: 0
+                }}>
+                  {typeof statData.icon === 'string' && statData.icon.includes(':') ? (
+                    <Icon icon={statData.icon} style={{ fontSize: '28px', color: accent }} />
+                  ) : (
+                    <span style={{ fontSize: '26px', lineHeight: 1 }}>{String(statData.icon)}</span>
+                  )}
+                </div>
+              )}
             </div>
-            <div style={{ 
-              fontSize: '14px', 
-              color: '#999',
-              marginBottom: '12px'
-            }}>
-              {statData.label}
+
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '10px', gap: '12px', flexWrap: 'wrap' }}>
+              {statData.trend && (
+                <div style={{ 
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '6px 12px',
+                  borderRadius: '10px',
+                  fontSize: '13px',
+                  fontWeight: 700,
+                  backgroundColor: statData.trend.direction === 'up' ? 'rgba(34, 197, 94, 0.12)' : 
+                                   statData.trend.direction === 'down' ? 'rgba(239, 68, 68, 0.12)' : 'rgba(153, 153, 153, 0.12)',
+                  color: statData.trend.direction === 'up' ? '#22C55E' : 
+                         statData.trend.direction === 'down' ? '#EF4444' : '#999',
+                  border: '1px solid rgba(255,255,255,0.06)'
+                }}>
+                  <Icon icon={
+                    statData.trend.direction === 'up' ? 'lucide:trending-up' :
+                    statData.trend.direction === 'down' ? 'lucide:trending-down' :
+                    'lucide:minus'
+                  } style={{ fontSize: '14px' }} />
+                  <span>{statData.trend.value}{typeof statData.trend.value === 'number' ? '%' : ''}</span>
+                  {statData.trend.label && <span style={{ opacity: 0.75 }}>{statData.trend.label}</span>}
+                </div>
+              )}
+              {statData.description && (
+                <div style={{ 
+                  fontSize: '12px', 
+                  color: '#A0A0A0',
+                  lineHeight: '1.5'
+                }}>
+                  {statData.description}
+                </div>
+              )}
             </div>
-            {statData.trend && (
-              <div style={{ 
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                fontSize: '13px',
-                color: statData.trend.direction === 'up' ? '#22C55E' : 
-                       statData.trend.direction === 'down' ? '#EF4444' : '#999'
-              }}>
-                <span>{statData.trend.direction === 'up' ? '↑' : statData.trend.direction === 'down' ? '↓' : '→'}</span>
-                <span>{statData.trend.value}{typeof statData.trend.value === 'number' ? '%' : ''}</span>
-                {statData.trend.label && <span style={{ color: '#666' }}>({statData.trend.label})</span>}
-              </div>
-            )}
-            {statData.description && (
-              <div style={{ 
-                fontSize: '12px', 
-                color: '#666',
-                marginTop: '8px'
-              }}>
-                {statData.description}
-              </div>
-            )}
           </div>
         );
       }
@@ -184,14 +229,17 @@ export const ComponentRenderer: React.FC<ComponentRendererProps> = ({ component 
     <div style={{
       gridArea: component.gridArea,
       backgroundColor: component.style?.backgroundColor || '#17181C',
-      border: `1px solid ${component.style?.borderColor || '#2A2C33'}`,
-      borderRadius: component.style?.borderRadius || '8px',
-      padding: component.style?.padding || '16px',
+      background: component.type === 'stat-card' && (component.data as any)?.gradient ? (component.data as any).gradient : undefined,
+      border: `1px solid ${component.type === 'stat-card' && (component.data as any)?.gradient ? 'rgba(255,255,255,0.06)' : (component.style?.borderColor || '#2A2C33')}`,
+      borderRadius: component.style?.borderRadius || '12px',
+      padding: component.style?.padding || (component.type === 'stat-card' ? '20px' : '16px'),
       display: 'flex',
       flexDirection: 'column',
       minHeight: component.style?.minHeight || '150px',
       height: '100%',
       overflow: 'hidden',
+      boxShadow: '0 8px 24px rgba(0,0,0,0.25)',
+      transition: 'transform 0.15s ease, box-shadow 0.2s ease',
     }}>
       {component.title && (
         <div style={{ 

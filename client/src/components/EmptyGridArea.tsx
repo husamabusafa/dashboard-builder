@@ -1,4 +1,5 @@
 import React from 'react';
+import { Icon } from '@iconify/react';
 
 interface EmptyGridAreaProps {
   gridArea: string;
@@ -9,10 +10,11 @@ export const EmptyGridArea: React.FC<EmptyGridAreaProps> = ({ gridArea }) => {
     <div
       style={{
         gridArea: gridArea,
-        backgroundColor: '#17181C',
+        position: 'relative',
+        background: 'linear-gradient(135deg, #1a1b1e 0%, #17181c 100%)',
         border: '2px dashed #2A2C33',
-        borderRadius: '8px',
-        padding: '16px',
+        borderRadius: '12px',
+        padding: '20px',
         display: 'flex',
         flexDirection: 'column',
         alignItems: 'center',
@@ -23,53 +25,53 @@ export const EmptyGridArea: React.FC<EmptyGridAreaProps> = ({ gridArea }) => {
     >
       {/* Icon */}
       <div style={{
-        width: '48px',
-        height: '48px',
-        borderRadius: '50%',
-        backgroundColor: '#1F1F1F',
-        display: 'flex',
+        display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: '24px',
-        marginBottom: '12px',
-        opacity: 0.5
+        width: '60px',
+        height: '60px',
+        borderRadius: '14px',
+        background: 'linear-gradient(135deg, rgba(99,102,241,0.15), rgba(139,92,246,0.15))',
+        boxShadow: '0 8px 32px rgba(99, 102, 241, 0.15)',
+        marginBottom: '14px'
       }}>
-        📊
+        <Icon icon="lucide:square-plus" style={{ fontSize: '28px', color: '#6366F1' }} />
       </div>
 
       {/* Text */}
       <div style={{
         textAlign: 'center',
-        color: '#666',
+        color: '#AAA',
       }}>
         <div style={{
-          fontSize: '12px',
-          fontWeight: 600,
-          marginBottom: '4px',
-          color: '#888'
+          fontSize: '13px',
+          fontWeight: 700,
+          marginBottom: '6px',
+          color: '#FFFFFF',
+          letterSpacing: '-0.01em'
         }}>
           Empty Grid Area
         </div>
         <div style={{
-          fontSize: '11px',
-          color: '#555'
+          fontSize: '12px',
+          color: '#8b8b8b'
         }}>
           <code style={{
-            backgroundColor: '#1F1F1F',
-            padding: '2px 6px',
-            borderRadius: '3px',
+            backgroundColor: 'rgba(99,102,241,0.08)',
+            border: '1px solid rgba(99,102,241,0.25)',
+            padding: '4px 8px',
+            borderRadius: '6px',
             fontFamily: 'monospace'
           }}>
             {gridArea}
           </code>
         </div>
         <div style={{
-          fontSize: '10px',
-          color: '#444',
-          marginTop: '8px',
-          fontStyle: 'italic'
+          fontSize: '12px',
+          color: '#888',
+          marginTop: '10px'
         }}>
-          Ask AI to add a component here
+          Ask the AI to add a component here
         </div>
       </div>
 
@@ -78,13 +80,18 @@ export const EmptyGridArea: React.FC<EmptyGridAreaProps> = ({ gridArea }) => {
         position: 'absolute',
         top: '8px',
         right: '8px',
-        fontSize: '10px',
-        backgroundColor: '#1F1F1F',
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: '6px',
+        fontSize: '11px',
+        backgroundColor: 'rgba(99,102,241,0.08)',
+        border: '1px solid rgba(99,102,241,0.25)',
         padding: '4px 8px',
-        borderRadius: '4px',
-        color: '#666',
+        borderRadius: '8px',
+        color: '#AAA',
         fontFamily: 'monospace'
       }}>
+        <Icon icon="lucide:grid-2x2" style={{ fontSize: '14px', color: '#6366F1' }} />
         {gridArea}
       </div>
     </div>

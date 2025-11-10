@@ -2,6 +2,7 @@ import { HsafaChat, ContentContainer } from '@hsafa/ui-sdk';
 import { HsafaProvider } from '@hsafa/ui-sdk';
 import { useHsafa } from '@hsafa/ui-sdk';
 import { useState, useRef, useEffect, useMemo, useCallback } from 'react';
+import { Icon } from '@iconify/react';
 import { createDashboardTools } from './DashboardBuilderTools';
 import type { DashboardState } from '../types/types';
 import { ComponentRenderer } from './ComponentRenderer';
@@ -173,15 +174,23 @@ function DashboardContent() {
             alignItems: 'center',
             justifyContent: 'center',
             minHeight: '500px',
-            backgroundColor: '#17181C',
+            background: 'linear-gradient(135deg, #1a1b1e 0%, #17181c 100%)',
             border: '2px dashed #2A2C33',
-            borderRadius: '12px',
+            borderRadius: '16px',
             padding: '48px 24px',
           }}>
             <div style={{ textAlign: 'center', maxWidth: '500px' }}>
-              <div style={{ fontSize: '64px', marginBottom: '24px', opacity: 0.6 }}>💬</div>
-              <h3 style={{ margin: 0, fontSize: '20px', fontWeight: 600, color: '#FFFFFF' }}>Open the chat to view this dashboard</h3>
-              <p style={{ marginTop: '8px', color: '#888', fontSize: '13px' }}>Each chat has its own dashboard. Open or switch chats to see their dashboards.</p>
+              <div style={{ 
+                display: 'inline-flex',
+                padding: '20px',
+                borderRadius: '16px',
+                backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                marginBottom: '24px'
+              }}>
+                <Icon icon="lucide:message-square" style={{ fontSize: '64px', color: '#6366F1', opacity: 0.9 }} />
+              </div>
+              <h3 style={{ margin: 0, fontSize: '24px', fontWeight: 600, color: '#FFFFFF' }}>Open the chat to view this dashboard</h3>
+              <p style={{ marginTop: '12px', color: '#888', fontSize: '14px', lineHeight: '1.6' }}>Each chat has its own dashboard. Open or switch chats to see their dashboards.</p>
             </div>
           </div>
         ) : gridAreas.length === 0 ? (
@@ -190,42 +199,72 @@ function DashboardContent() {
             alignItems: 'center',
             justifyContent: 'center',
             minHeight: '500px',
-            backgroundColor: '#17181C',
+            background: 'linear-gradient(135deg, #1a1b1e 0%, #17181c 100%)',
             border: '2px dashed #2A2C33',
-            borderRadius: '12px',
+            borderRadius: '16px',
             padding: '48px 24px',
           }}>
-            <div style={{ textAlign: 'center', maxWidth: '500px' }}>
-              <div style={{ fontSize: '64px', marginBottom: '24px', opacity: 0.6 }}>📊</div>
+            <div style={{ textAlign: 'center', maxWidth: '550px' }}>
+              <div style={{ 
+                display: 'inline-flex',
+                padding: '24px',
+                borderRadius: '20px',
+                background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%)',
+                marginBottom: '28px',
+                boxShadow: '0 8px 32px rgba(99, 102, 241, 0.15)'
+              }}>
+                <Icon icon="lucide:layout-dashboard" style={{ fontSize: '72px', color: '#6366F1' }} />
+              </div>
               <h3 style={{
                 margin: '0 0 12px 0',
-                fontSize: '24px',
-                fontWeight: 600,
-                color: '#FFFFFF'
+                fontSize: '28px',
+                fontWeight: 700,
+                color: '#FFFFFF',
+                letterSpacing: '-0.02em'
               }}>
                 No Dashboard Yet
               </h3>
               <p style={{
-                margin: '0 0 24px 0',
-                fontSize: '14px',
-                color: '#888',
-                lineHeight: '1.6'
+                margin: '0 0 32px 0',
+                fontSize: '15px',
+                color: '#999',
+                lineHeight: '1.7'
               }}>
                 Start by asking the AI to create a grid layout for your dashboard.
                 The AI will help you design and populate it with components.
               </p>
               <div style={{
-                padding: '16px',
-                backgroundColor: '#1F1F1F',
-                borderRadius: '8px',
-                border: '1px solid #2A2C33',
+                padding: '20px 24px',
+                background: 'rgba(99, 102, 241, 0.05)',
+                borderRadius: '12px',
+                border: '1px solid rgba(99, 102, 241, 0.2)',
                 textAlign: 'left'
               }}>
-                <div style={{ fontSize: '12px', color: '#666', marginBottom: '8px', fontWeight: 600 }}>Try asking:</div>
-                <div style={{ fontSize: '13px', color: '#999', fontFamily: 'monospace', lineHeight: '1.8' }}>
-                  • "Create a 2x2 grid layout"<br/>
-                  • "Set up a dashboard with header and main area"<br/>
-                  • "Make a 3-column layout with sidebar"
+                <div style={{ 
+                  fontSize: '13px', 
+                  color: '#6366F1', 
+                  marginBottom: '12px', 
+                  fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px'
+                }}>
+                  <Icon icon="lucide:sparkles" style={{ fontSize: '16px' }} />
+                  Try asking:
+                </div>
+                <div style={{ fontSize: '14px', color: '#AAA', lineHeight: '2' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
+                    <Icon icon="lucide:check" style={{ fontSize: '16px', color: '#6366F1', flexShrink: 0 }} />
+                    <span>"Create a 2x2 grid layout"</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '4px' }}>
+                    <Icon icon="lucide:check" style={{ fontSize: '16px', color: '#6366F1', flexShrink: 0 }} />
+                    <span>"Set up a dashboard with header and main area"</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <Icon icon="lucide:check" style={{ fontSize: '16px', color: '#6366F1', flexShrink: 0 }} />
+                    <span>"Make a 3-column layout with sidebar"</span>
+                  </div>
                 </div>
               </div>
             </div>
