@@ -45,6 +45,7 @@ export function HsafaChat({
   onMessagesChange?: (messages: any[], chatId?: string) => void;
   HsafaUI?: Record<string, React.ComponentType<any>>;
 }) {
+  console.log('HsafaChat123', agentId);
   const { dir: providerDir, theme: providerTheme, baseUrl: providerBaseUrl, setStreamingState, setChatOpenState } = useHsafa();
   const effectiveTheme = (theme || providerTheme || 'dark');
   const effectiveBaseUrl = (baseUrl && baseUrl.length > 0) ? baseUrl : (providerBaseUrl || '');

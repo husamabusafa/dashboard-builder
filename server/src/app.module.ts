@@ -6,7 +6,7 @@ import { DataModule } from './data/data.module';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      url: 'postgres://postgres:postgres@localhost:5432/SA-GIS',
+      url: 'postgres://postgres:postgres@localhost:5432/dashboard-builder',
       autoLoadEntities: true,
       synchronize: false,
     }),

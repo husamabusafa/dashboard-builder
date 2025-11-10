@@ -270,6 +270,16 @@ function DashboardContent() {
         expandable={false}
         HsafaTools={dashboardTools}
         HsafaUI={{}}
+        presetPrompts={[
+    {
+      label: "Code Review",
+      prompt: "Please review this code and provide suggestions for improvement"
+    },
+    {
+      label: "Documentation",
+      prompt: "Can you help me write comprehensive documentation for this function? I need it to include examples, parameter descriptions, and return value details."
+    }
+  ]}
         // onMessagesChange={handleMessagesChange}
         // onFinish={async (payload: { chatId?: string; message?: { id?: string; role?: string }; messages?: Array<{ id?: string; role?: string }> }) => {
         //   try {

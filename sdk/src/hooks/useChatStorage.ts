@@ -181,7 +181,7 @@ export function useChatStorage(config: UseChatStorageConfig): ChatStorageAPI {
         console.error('Failed to save chat:', error);
       }
     }
-  }, [messages, agentId, chatId, storage, isLoading, autoSave, refreshChatList]);
+  });
 
   // Save chat on stream completion
   const wasLoadingRef = useRef<boolean>(false);
@@ -194,13 +194,31 @@ export function useChatStorage(config: UseChatStorageConfig): ChatStorageAPI {
       wasLoadingRef.current = false;
       try {
         const now = Date.now();
+        // Always persist the latest messages for this chat
         storage.saveChat({ id: chatId, messages: messages as any, agentId } as any);
+
+        // Upsert metadata; if it doesn't exist yet, create it now
         const metas = storage.loadChatsIndex();
         const found = metas.find((m) => m.id === chatId);
         if (found) {
           storage.upsertChatMeta({ ...found, updatedAt: now });
-          refreshChatList();
+        } else {
+          // Create metadata on the first successful turn (after user sends a message)
+          let titleSource = '';
+          const firstUser = Array.isArray(messages)
+            ? (messages as any[]).find((m: any) => m && m.role === 'user')
+            : undefined;
+          if (firstUser && Array.isArray((firstUser as any).parts)) {
+            const textPart = (firstUser as any).parts.find((p: any) => p && p.type === 'text');
+            titleSource = textPart && typeof textPart.text === 'string' ? textPart.text : '';
+          }
+          const title = (titleSource || 'New chat').slice(0, 80);
+          storage.upsertChatMeta({ id: chatId, title, createdAt: now, updatedAt: now });
+          try { storage.saveCurrentChatId(chatId); } catch {}
+          createdChatRef.current = true;
         }
+
+        refreshChatList();
       } catch (error) {
         console.error('Failed to save chat on completion:', error);
       }

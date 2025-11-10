@@ -4,6 +4,7 @@ import DashboardBuilder from './components/DashboardBuilder';
 import { queryDatabase } from './utils/queryDatabase';
 
 function App() {
+    console.log('App');
   useEffect(() => {
     // Example 1: Fetch data from the NestJS server
     fetch('http://localhost:2100/data')
