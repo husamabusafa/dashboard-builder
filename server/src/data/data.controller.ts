@@ -11,7 +11,8 @@ export class DataController {
   }
 
   @Post('query')
-  async executeQuery(@Body() body: { query: string }) {
-    return this.dataService.executeQuery(body.query);
+  async executeQuery(@Body() body: { query: string; params?: any; schema?: string }) {
+    const { query, params, schema } = body || ({} as any);
+    return this.dataService.executeQuery(query, params, schema);
   }
 }

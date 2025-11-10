@@ -6,7 +6,7 @@ import { DataModule } from './data/data.module';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      url: 'postgres://postgres:postgres@localhost:5432/AI-commerce',
+      url: 'postgres://postgres:postgres@localhost:5432/SA-GIS',
       autoLoadEntities: true,
       synchronize: false,
     }),

@@ -46,19 +46,40 @@ export class DataService {
     }
   }
 
-  async executeQuery(query: string) {
+  async executeQuery(query: string, params?: any, schema?: string) {
+    const started = Date.now();
     try {
-      const result = await this.dataSource.query(query);
+      // Prepare parameters array
+      const parameters = Array.isArray(params)
+        ? params
+        : params && typeof params === 'object'
+          ? Object.values(params)
+          : [];
+
+      // Execute the query with parameters
+      const result = await this.dataSource.query(query, parameters);
+      const durationMs = Date.now() - started;
+
       return {
         success: true,
         data: result,
         rowCount: Array.isArray(result) ? result.length : 0,
+        meta: {
+          durationMs,
+          schema: schema || undefined,
+          params: parameters,
+        },
       };
-    } catch (error) {
+    } catch (error: any) {
+      const durationMs = Date.now() - started;
       return {
         success: false,
-        error: error.message,
+        error: error?.message || String(error),
         data: [],
+        meta: {
+          durationMs,
+          schema: schema || undefined,
+        },
       };
     }
   }

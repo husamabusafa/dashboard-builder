@@ -8,6 +8,7 @@ import type {
   ComponentType,
 } from '../types/types';
 import { DataFetcher } from '../utils/dataFetcher';
+import { normalizeToEChartsOption } from '../utils/chartUtils';
 import {
   isValidGridArea,
   isGridAreaOccupied,
@@ -108,7 +109,7 @@ export const createDashboardTools = (
 ) => {
   // Initialize data fetcher
   const dataFetcher = new DataFetcher({
-    mcpPostgresEndpoint: '/api/mcp/postgres',
+    mcpPostgresEndpoint: '/api/data/query',
     graphqlEndpoint: '/graphql',
   });
 
@@ -208,6 +209,11 @@ export const createDashboardTools = (
       description?: string;
       data: any; // Component data - ECharts options for chart, TableData for table, StatCardData for stat-card
       dataConfig?: ComponentDataConfig;
+      query?: {
+        sql: string;
+        handlebarsTemplate?: string;
+        alasqlTransform?: string;
+      };
       style?: any;
     }): Promise<ToolResponse> => {
       try {
@@ -242,6 +248,23 @@ export const createDashboardTools = (
           };
         }
 
+        // Auto-generate dataConfig from query if provided
+        let finalDataConfig = params.dataConfig;
+        if (params.query && !params.dataConfig) {
+          finalDataConfig = {
+            source: {
+              type: 'postgresql',
+              query: params.query.sql,
+            } as ComponentDataConfig['source'],
+            handlebarsTemplate: params.query.handlebarsTemplate ? {
+              template: params.query.handlebarsTemplate,
+            } : undefined,
+            alasqlTransform: params.query.alasqlTransform ? {
+              query: params.query.alasqlTransform,
+            } : undefined,
+          };
+        }
+
         // Create component with initial data
         const newComponent: DashboardComponent = {
           id: params.id,
@@ -250,7 +273,7 @@ export const createDashboardTools = (
           title: params.title,
           description: params.description,
           data: params.data,
-          dataConfig: params.dataConfig,
+          dataConfig: finalDataConfig,
           style: params.style,
           metadata: {
             createdAt: new Date().toISOString(),
@@ -266,17 +289,69 @@ export const createDashboardTools = (
           }
         }));
 
+        // Auto-fetch data if query was provided, with trace
+        let lastTraceResult: { final: any; trace: any; error?: any } | undefined;
+        if (params.query && finalDataConfig) {
+          try {
+            const traceResult = await dataFetcher.fetchDataWithTrace(params.id, finalDataConfig);
+            const normalized = params.type === 'chart' ? normalizeToEChartsOption(traceResult.final) : traceResult.final;
+            lastTraceResult = { ...traceResult, final: normalized } as any;
+            setDashboardState(prev => ({
+              ...prev,
+              components: {
+                ...prev.components,
+                [params.id]: {
+                  ...prev.components[params.id],
+                  data: normalized,
+                  metadata: {
+                    ...prev.components[params.id].metadata,
+                    fetchStatus: traceResult.error ? 'error' : 'success',
+                    lastFetchedAt: new Date().toISOString(),
+                    error: traceResult.error || undefined,
+                  }
+                }
+              }
+            }));
+          } catch (error) {
+            console.error('Auto-fetch failed:', error);
+            setDashboardState(prev => ({
+              ...prev,
+              components: {
+                ...prev.components,
+                [params.id]: {
+                  ...prev.components[params.id],
+                  metadata: {
+                    ...prev.components[params.id].metadata,
+                    fetchStatus: 'error',
+                    error: error instanceof Error ? error.message : 'Unknown error',
+                  }
+                }
+              }
+            }));
+          }
+        }
+
         const stats = getGridStats(getDashboardState());
         
         return {
           success: true,
-          message: `Component "${params.id}" created successfully in grid area "${params.gridArea}"`,
+          message: `Component "${params.id}" created successfully in grid area "${params.gridArea}"${params.query ? ' (data fetch attempted)' : ''}`,
           data: {
-            component: newComponent,
+            component: getDashboardState().components[params.id],
             gridStats: stats,
             suggestion: stats.availableAreas > 0 
               ? `${stats.availableAreas} grid area(s) still available: ${stats.availableAreaNames.join(', ')}` 
-              : 'All grid areas are now occupied'
+              : 'All grid areas are now occupied',
+            fetch: lastTraceResult ? {
+              postgresResponse: lastTraceResult.trace?.raw,
+              finalData: lastTraceResult.final,
+              transform: {
+                afterHandlebars: lastTraceResult.trace?.afterHandlebars,
+                afterAlaSQL: lastTraceResult.trace?.afterAlaSQL,
+                afterNormalize: lastTraceResult.final,
+              },
+              error: lastTraceResult.error,
+            } : undefined
           }
         };
       } catch (error) {
@@ -391,10 +466,65 @@ export const createDashboardTools = (
           }
         }));
 
+        // If the update included/affected dataConfig, attempt fetch with trace
+        let fetchInfo: any = undefined;
+        const cfg: ComponentDataConfig | undefined = updatedComponent.dataConfig;
+        if (cfg && cfg.source) {
+          try {
+            const traceResult = await dataFetcher.fetchDataWithTrace(params.id, cfg);
+            const normalized = updatedComponent.type === 'chart' ? normalizeToEChartsOption(traceResult.final) : traceResult.final;
+            fetchInfo = {
+              postgresResponse: traceResult.trace?.raw,
+              finalData: normalized,
+              transform: {
+                afterHandlebars: traceResult.trace?.afterHandlebars,
+                afterAlaSQL: traceResult.trace?.afterAlaSQL,
+                afterNormalize: normalized,
+              },
+              error: traceResult.error,
+            };
+            setDashboardState(prev => ({
+              ...prev,
+              components: {
+                ...prev.components,
+                [params.id]: {
+                  ...prev.components[params.id],
+                  data: normalized,
+                  metadata: {
+                    ...prev.components[params.id].metadata,
+                    fetchStatus: traceResult.error ? 'error' : 'success',
+                    lastFetchedAt: new Date().toISOString(),
+                    error: traceResult.error || undefined,
+                  }
+                }
+              }
+            }));
+          } catch (error) {
+            setDashboardState(prev => ({
+              ...prev,
+              components: {
+                ...prev.components,
+                [params.id]: {
+                  ...prev.components[params.id],
+                  metadata: {
+                    ...prev.components[params.id].metadata,
+                    fetchStatus: 'error',
+                    error: error instanceof Error ? error.message : 'Unknown error',
+                  }
+                }
+              }
+            }));
+            fetchInfo = { error: error instanceof Error ? error.message : 'Unknown error' };
+          }
+        }
+
         return {
           success: true,
-          message: `Component "${params.id}" updated successfully using ${operation} operation`,
-          data: updatedComponent
+          message: `Component "${params.id}" updated successfully using ${operation} operation` + (fetchInfo ? ' (data fetch attempted)' : ''),
+          data: {
+            component: getDashboardState().components[params.id],
+            fetch: fetchInfo,
+          }
         };
       } catch (error) {
         return {
@@ -499,22 +629,32 @@ export const createDashboardTools = (
           }
         }));
 
-        // Fetch data
-        const fetchedData = await dataFetcher.fetchData(params.id, component.dataConfig);
+        // Validate dataConfig exists
+        if (!component.dataConfig) {
+          return {
+            success: false,
+            error: `Component "${params.id}" has no dataConfig to fetch from`,
+          };
+        }
 
-        // Update component with fetched data
+        // Fetch data with trace
+        const cfgFetch: ComponentDataConfig = component.dataConfig as ComponentDataConfig;
+        const traceResult = await dataFetcher.fetchDataWithTrace(params.id, cfgFetch);
+        const normalized = component.type === 'chart' ? normalizeToEChartsOption(traceResult.final) : traceResult.final;
+
+        // Update component with fetched final data
         setDashboardState(prev => ({
           ...prev,
           components: {
             ...prev.components,
             [params.id]: {
               ...prev.components[params.id],
-              data: fetchedData,
+              data: normalized,
               metadata: {
                 ...prev.components[params.id].metadata,
-                fetchStatus: 'success',
+                fetchStatus: traceResult.error ? 'error' : 'success',
                 lastFetchedAt: new Date().toISOString(),
-                error: undefined,
+                error: traceResult.error || undefined,
               }
             }
           }
@@ -523,7 +663,16 @@ export const createDashboardTools = (
         return {
           success: true,
           message: `Data fetched successfully for component "${params.id}"`,
-          data: fetchedData
+          data: {
+            finalData: normalized,
+            postgresResponse: traceResult.trace?.raw,
+            transform: {
+              afterHandlebars: traceResult.trace?.afterHandlebars,
+              afterAlaSQL: traceResult.trace?.afterAlaSQL,
+              afterNormalize: normalized,
+            },
+            error: traceResult.error,
+          }
         };
       } catch (error) {
         // Update status to error
@@ -555,36 +704,54 @@ export const createDashboardTools = (
         const componentIds = Object.keys(currentState.components);
         
         const results = await Promise.allSettled(
-          componentIds.map(id => 
-            dataFetcher.fetchData(id, currentState.components[id].dataConfig)
-          )
+          componentIds.map(async (id) => {
+            const c = getDashboardState().components[id];
+            const cfg = c.dataConfig;
+            if (!cfg) {
+              return { id, skipped: true, reason: 'no dataConfig' } as const;
+            }
+            const trace = await dataFetcher.fetchDataWithTrace(id, cfg);
+            const final = c.type === 'chart' ? normalizeToEChartsOption(trace.final) : trace.final;
+            return { id, skipped: false, trace, final } as const;
+          })
         );
 
         // Update all components with fetched data
         setDashboardState(prev => {
           const updatedComponents = { ...prev.components };
-          
-          componentIds.forEach((id, index) => {
-            const result = results[index];
-            
-            if (result.status === 'fulfilled') {
+          let successCount = 0;
+          let errorCount = 0;
+          let skippedCount = 0;
+          results.forEach((res, index) => {
+            const id = componentIds[index];
+            if (res.status === 'fulfilled') {
+              const val = res.value as any;
+              if (val?.skipped) {
+                skippedCount += 1;
+                return;
+              }
+              const trace = val.trace;
+              const final = val.final;
+              successCount += trace?.error ? 0 : 1;
+              errorCount += trace?.error ? 1 : 0;
               updatedComponents[id] = {
                 ...updatedComponents[id],
-                data: result.value,
+                data: final,
                 metadata: {
                   ...updatedComponents[id].metadata,
-                  fetchStatus: 'success',
+                  fetchStatus: trace?.error ? 'error' : 'success',
                   lastFetchedAt: new Date().toISOString(),
-                  error: undefined,
+                  error: trace?.error || undefined,
                 }
               };
             } else {
+              errorCount += 1;
               updatedComponents[id] = {
                 ...updatedComponents[id],
                 metadata: {
                   ...updatedComponents[id].metadata,
                   fetchStatus: 'error',
-                  error: result.reason?.message || 'Unknown error',
+                  error: (res as any).reason?.message || 'Unknown error',
                 }
               };
             }
@@ -599,7 +766,7 @@ export const createDashboardTools = (
         return {
           success: true,
           message: `Refreshed ${componentIds.length} components`,
-          data: { refreshedCount: componentIds.length }
+          data: { total: componentIds.length }
         };
       } catch (error) {
         return {

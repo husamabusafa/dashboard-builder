@@ -8,7 +8,7 @@ import type {
   StaticData,
   HandlebarsTemplate,
   AlaSQLTransform,
-} from './types';
+} from '../types/types';
 
 // Data Fetcher Class
 
@@ -66,6 +66,62 @@ export class DataFetcher {
     }
   }
 
+  async fetchDataWithTrace(
+    componentId: string,
+    config: ComponentDataConfig
+  ): Promise<{
+    final: any;
+    trace: { source: string; raw: any; afterHandlebars?: any; afterAlaSQL?: any };
+    error?: string | any;
+  }> {
+    try {
+      let raw: any;
+      const sourceType = config.source.type;
+
+      if (sourceType === 'postgresql') {
+        raw = await this.fetchFromPostgreSQLRaw(config.source as PostgreSQLQuery);
+      } else if (sourceType === 'graphql') {
+        raw = await this.fetchFromGraphQL(config.source as GraphQLQuery);
+      } else if (sourceType === 'static') {
+        raw = await this.fetchFromStatic(config.source as StaticData);
+      } else {
+        throw new Error(`Unknown data source type: ${(config.source as any).type}`);
+      }
+
+      const rawForTransform = raw && typeof raw === 'object' && 'data' in raw ? (raw as any).data : raw;
+
+      let afterHandlebars: any = rawForTransform;
+      if (config.handlebarsTemplate) {
+        afterHandlebars = this.applyHandlebarsTemplate(rawForTransform, config.handlebarsTemplate);
+      }
+
+      let afterAlaSQL: any = afterHandlebars;
+      if (config.alasqlTransform) {
+        afterAlaSQL = this.applyAlaSQLTransform(afterHandlebars, config.alasqlTransform);
+      }
+
+      const final = afterAlaSQL;
+
+      if (config.cache?.enabled) {
+        this.setCache(componentId, final);
+      }
+
+      const possibleError = raw && typeof raw === 'object' && 'error' in raw ? (raw as any).error : undefined;
+
+      return {
+        final,
+        trace: { source: sourceType, raw, afterHandlebars: config.handlebarsTemplate ? afterHandlebars : undefined, afterAlaSQL: config.alasqlTransform ? afterAlaSQL : undefined },
+        error: possibleError,
+      };
+    } catch (error: any) {
+      return {
+        final: undefined,
+        trace: { source: config.source.type, raw: undefined },
+        error: error?.message || error,
+      };
+    }
+  }
+
   /**
    * Fetch data from the specified source
    */
@@ -119,6 +175,36 @@ export class DataFetcher {
       return result.data || result;
     } catch (error) {
       console.warn('PostgreSQL fetch error:', error);
+      return { error: error instanceof Error ? error.message : 'Unknown error' };
+    }
+  }
+
+  private async fetchFromPostgreSQLRaw(source: PostgreSQLQuery): Promise<any> {
+    if (!this.mcpPostgresEndpoint) {
+      return { error: 'PostgreSQL endpoint not configured' };
+    }
+
+    if (typeof fetch === 'undefined') {
+      return { error: 'fetch not available' };
+    }
+
+    try {
+      const response = await fetch(this.mcpPostgresEndpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: source.query,
+          params: source.params,
+          schema: source.schema,
+        }),
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        return { error: result?.error || response.statusText, ...result };
+      }
+      return result;
+    } catch (error) {
       return { error: error instanceof Error ? error.message : 'Unknown error' };
     }
   }
