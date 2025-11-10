@@ -6,12 +6,6 @@ import type {
   ComponentDataConfig,
   PostgreSQLSchema,
   ComponentType,
-  ChartData,
-  TableData,
-  StatCardData,
-  MetricCardData,
-  GaugeData,
-  HeatmapData,
 } from '../types/types';
 import { DataFetcher } from '../utils/dataFetcher';
 import {
@@ -210,11 +204,10 @@ export const createDashboardTools = (
       id: string;
       type: ComponentType;
       gridArea: string;
-      title: string;
+      title?: string;
       description?: string;
-      dataConfig: ComponentDataConfig;
-      data?: ChartData | TableData | StatCardData | MetricCardData | GaugeData | HeatmapData;
-      options?: any;
+      data: any; // Component data - ECharts options for chart, TableData for table, StatCardData for stat-card
+      dataConfig?: ComponentDataConfig;
       style?: any;
     }): Promise<ToolResponse> => {
       try {
@@ -256,9 +249,8 @@ export const createDashboardTools = (
           gridArea: params.gridArea,
           title: params.title,
           description: params.description,
+          data: params.data,
           dataConfig: params.dataConfig,
-          data: params.data || {},
-          options: params.options,
           style: params.style,
           metadata: {
             createdAt: new Date().toISOString(),
@@ -298,7 +290,9 @@ export const createDashboardTools = (
     update_component: async (params: {
       id: string;
       path?: string;
-      updates: any;
+      updates?: any;
+      operation?: 'set' | 'push' | 'splice' | 'merge';
+      operationParams?: any;
     }): Promise<ToolResponse> => {
       try {
         const currentState = getDashboardState();
@@ -312,10 +306,72 @@ export const createDashboardTools = (
         }
 
         let updatedComponent: DashboardComponent;
+        const operation = params.operation || 'set';
 
         if (params.path) {
-          updatedComponent = setValueAtPath(component, params.path, params.updates) as DashboardComponent;
+          // Path-based updates
+          const pathInfo = navigateToPath(component, params.path);
+          
+          if (!pathInfo.exists && operation !== 'set') {
+            return {
+              success: false,
+              error: `Path "${params.path}" not found in component`
+            };
+          }
+
+          switch (operation) {
+            case 'push': {
+              // Add item(s) to array
+              if (!Array.isArray(pathInfo.value)) {
+                return {
+                  success: false,
+                  error: `Path "${params.path}" is not an array. Cannot push.`
+                };
+              }
+              const newArray = [...pathInfo.value, ...(Array.isArray(params.updates) ? params.updates : [params.updates])];
+              updatedComponent = setValueAtPath(component, params.path, newArray) as DashboardComponent;
+              break;
+            }
+            
+            case 'splice': {
+              // Remove/replace items in array
+              if (!Array.isArray(pathInfo.value)) {
+                return {
+                  success: false,
+                  error: `Path "${params.path}" is not an array. Cannot splice.`
+                };
+              }
+              const { start = 0, deleteCount = 1, items = [] } = params.operationParams || {};
+              const newArray = [...pathInfo.value];
+              newArray.splice(start, deleteCount, ...items);
+              updatedComponent = setValueAtPath(component, params.path, newArray) as DashboardComponent;
+              break;
+            }
+            
+            case 'merge': {
+              // Deep merge objects
+              if (typeof pathInfo.value !== 'object' || pathInfo.value === null) {
+                return {
+                  success: false,
+                  error: `Path "${params.path}" is not an object. Cannot merge.`
+                };
+              }
+              const merged = Array.isArray(pathInfo.value)
+                ? [...pathInfo.value, ...(Array.isArray(params.updates) ? params.updates : [])]
+                : { ...pathInfo.value, ...params.updates };
+              updatedComponent = setValueAtPath(component, params.path, merged) as DashboardComponent;
+              break;
+            }
+            
+            case 'set':
+            default: {
+              // Direct set
+              updatedComponent = setValueAtPath(component, params.path, params.updates) as DashboardComponent;
+              break;
+            }
+          }
         } else {
+          // Root-level updates
           updatedComponent = {
             ...component,
             ...params.updates,
@@ -337,7 +393,7 @@ export const createDashboardTools = (
 
         return {
           success: true,
-          message: `Component "${params.id}" updated successfully`,
+          message: `Component "${params.id}" updated successfully using ${operation} operation`,
           data: updatedComponent
         };
       } catch (error) {

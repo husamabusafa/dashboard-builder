@@ -1,4 +1,4 @@
-export type ComponentType = 'chart';
+export type ComponentType = 'chart' | 'table' | 'stat-card';
 
 export interface PostgreSQLQuery {
   type: 'postgresql';
@@ -179,7 +179,8 @@ export interface DashboardComponent {
   gridArea: string;
   title?: string;
   description?: string;
-  options: any;
+  data: any; // Component data - ECharts options for chart, TableData for table, StatCardData for stat-card
+  dataConfig?: ComponentDataConfig;
   style?: {
     backgroundColor?: string;
     borderColor?: string;
@@ -190,6 +191,9 @@ export interface DashboardComponent {
   metadata?: {
     createdAt?: string;
     updatedAt?: string;
+    fetchStatus?: 'idle' | 'loading' | 'success' | 'error';
+    error?: string;
+    lastFetchedAt?: string;
   };
 }
 
