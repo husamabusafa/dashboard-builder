@@ -6,15 +6,35 @@ NestJS server with PostgreSQL integration for the dashboard builder application.
 
 - Node.js installed
 - PostgreSQL running on `localhost:5432`
-- Database: `AI-commerce`
-- Credentials: `postgres:postgres`
+- Database: `dashboard-builder` (or your custom database)
 
 ## Installation
 
-Dependencies are already installed. If needed:
+1. Install dependencies:
 
 ```bash
-npm install
+pnpm install
+```
+
+2. Create a `.env` file from the example:
+
+```bash
+cp .env.example .env
+```
+
+3. Update the `.env` file with your database credentials:
+
+```env
+PORT=2100
+
+DATABASE_TYPE=postgres
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_USERNAME=postgres
+DATABASE_PASSWORD=postgres
+DATABASE_NAME=dashboard-builder
+
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/dashboard-builder
 ```
 
 ## Running the Server
@@ -45,7 +65,10 @@ The server will run on `http://localhost:2100`
 
 ## Database Connection
 
-Connection string: `postgres://postgres:postgres@localhost:5432/AI-commerce`
+The database connection is configured via environment variables in the `.env` file. The server supports both individual connection parameters and a full connection URL:
+
+- `DATABASE_URL` - Full PostgreSQL connection string (recommended)
+- Or individual parameters: `DATABASE_HOST`, `DATABASE_PORT`, `DATABASE_USERNAME`, `DATABASE_PASSWORD`, `DATABASE_NAME`
 
 The server will:
 1. List all tables in the database

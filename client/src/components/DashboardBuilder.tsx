@@ -24,11 +24,12 @@ const EMPTY_DASHBOARD: DashboardState = {
   }
 };
 
-const AGENT_ID = 'cmhijn9sv0007qggw7c4ipwm3';
+const AGENT_ID = import.meta.env.VITE_AGENT_ID || 'cmhijn9sv0007qggw7c4ipwm3';
+const AGENT_BASE_URL = import.meta.env.VITE_AGENT_BASE_URL || 'http://localhost:3900';
 
 export default function DashboardBuilder() {
   return (
-    <HsafaProvider baseUrl="http://localhost:3900">
+    <HsafaProvider baseUrl={AGENT_BASE_URL}>
       <ContentContainer>
         <DashboardContent />
       </ContentContainer>

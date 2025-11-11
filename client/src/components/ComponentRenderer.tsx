@@ -3,6 +3,27 @@ import ReactECharts from 'echarts-for-react';
 import { Icon } from '@iconify/react';
 import type { DashboardComponent, TableData, StatCardData } from '../types/types';
 
+const formatCompactNumber = (value: number | string): string => {
+  const num = typeof value === 'string' ? Number(value) : value;
+  if (typeof num !== 'number' || isNaN(num)) return String(value);
+  const abs = Math.abs(num);
+  const sign = num < 0 ? '-' : '';
+  const units = [
+    { v: 1e12, s: 'T' },
+    { v: 1e9,  s: 'B' },
+    { v: 1e6,  s: 'M' },
+    { v: 1e3,  s: 'K' },
+  ];
+  for (const u of units) {
+    if (abs >= u.v) {
+      const raw = abs / u.v;
+      const fixed = raw < 10 ? raw.toFixed(1) : Math.round(raw).toString();
+      return `${sign}${fixed.replace(/\.0$/, '')}${u.s}`;
+    }
+  }
+  return `${sign}${abs.toLocaleString()}`;
+};
+
 interface ComponentRendererProps {
   component: DashboardComponent;
 }
@@ -48,13 +69,16 @@ export const ComponentRenderer: React.FC<ComponentRendererProps> = ({ component 
           );
         }
 
+        const maxTableHeight = (component as any)?.style?.maxTableHeight || '320px';
+
         return (
-          <div style={{ overflowX: 'auto', flex: 1 }}>
+          <div style={{ overflowX: 'auto', overflowY: 'auto', maxHeight: maxTableHeight, flex: 1 }}>
             <table style={{ 
               width: '100%', 
               borderCollapse: 'separate',
               borderSpacing: 0,
-              fontSize: '13px'
+              fontSize: '13px',
+              tableLayout: 'fixed'
             }}>
               <thead>
                 <tr style={{ 
@@ -67,11 +91,16 @@ export const ComponentRenderer: React.FC<ComponentRendererProps> = ({ component 
                       style={{
                         textAlign: col.align || 'left',
                         padding: '14px 12px',
-                        color: '#AAA',
+                        color: '#AAA', 
                         fontWeight: 600,
                         fontSize: '12px',
                         textTransform: 'uppercase',
                         letterSpacing: '0.5px',
+                        position: 'sticky',
+                        top: 0,
+                        zIndex: 2,
+                        backgroundColor: '#17181C',
+                        width: col.width
                       }}
                     >
                       {col.label}
@@ -86,9 +115,10 @@ export const ComponentRenderer: React.FC<ComponentRendererProps> = ({ component 
                     style={{
                       borderBottom: '1px solid #1F1F1F',
                       transition: 'background-color 0.15s ease',
+                      backgroundColor: rowIndex % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.02)'
                     }}
-                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(99, 102, 241, 0.05)'}
-                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(99, 102, 241, 0.08)'}
+                    onMouseLeave={(e) => e.currentTarget.style.backgroundColor = rowIndex % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.02)'}
                   >
                     {tableData.columns.map((col) => (
                       <td
@@ -98,6 +128,10 @@ export const ComponentRenderer: React.FC<ComponentRendererProps> = ({ component 
                           textAlign: col.align || 'left',
                           color: col.color || '#DDD',
                           fontSize: '13px',
+                          width: col.width,
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis'
                         }}
                       >
                         {col.format ? col.format(row[col.key]) : row[col.key]}
@@ -152,7 +186,7 @@ export const ComponentRenderer: React.FC<ComponentRendererProps> = ({ component 
                   lineHeight: 1,
                   letterSpacing: '-0.02em'
                 }}>
-                  {statData.prefix}{statData.value}{statData.suffix}
+                  {statData.prefix}{formatCompactNumber(statData.value)}{statData.suffix}
                 </div>
               </div>
               {statData.icon && (

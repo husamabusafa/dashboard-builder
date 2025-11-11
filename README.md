@@ -19,13 +19,58 @@ This will start both the server and client simultaneously!
 
 ## 📦 Installation
 
-### Install All Dependencies
+### 1. Install All Dependencies
 
 ```bash
 pnpm i
 ```
 
 This installs dependencies for the root workspace AND both client and server.
+
+### 2. Configure Environment Variables
+
+#### Server Configuration
+
+Create a `.env` file in the `server/` directory:
+
+```bash
+cd server
+cp .env.example .env
+```
+
+Edit `server/.env` with your database credentials:
+
+```env
+PORT=2100
+
+DATABASE_TYPE=postgres
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_USERNAME=postgres
+DATABASE_PASSWORD=postgres
+DATABASE_NAME=dashboard-builder
+
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/dashboard-builder
+```
+
+#### Client Configuration (Optional)
+
+Create a `.env` file in the `client/` directory if you need custom API URLs or agent configuration:
+
+```bash
+cd client
+cp .env.example .env
+```
+
+Edit `client/.env` if needed:
+
+```env
+VITE_API_URL=http://localhost:2100
+VITE_API_BASE_PATH=/api/data
+
+VITE_AGENT_ID=cmhijn9sv0007qggw7c4ipwm3
+VITE_AGENT_BASE_URL=http://localhost:3900
+```
 
 ### Manual Installation (if needed)
 
@@ -67,10 +112,26 @@ pnpm run dev:client
 
 ### PostgreSQL Connection
 
-- **Connection String**: `postgres://postgres:postgres@localhost:5432/AI-commerce`
+The database connection is now configured via environment variables in `server/.env`:
+
+```env
+DATABASE_URL=postgres://postgres:postgres@localhost:5432/dashboard-builder
+```
+
+Or use individual parameters:
+
+```env
+DATABASE_HOST=localhost
+DATABASE_PORT=5432
+DATABASE_USERNAME=postgres
+DATABASE_PASSWORD=postgres
+DATABASE_NAME=dashboard-builder
+```
+
+**Default values:**
 - **Host**: localhost
 - **Port**: 5432
-- **Database**: AI-commerce
+- **Database**: dashboard-builder
 - **User**: postgres
 - **Password**: postgres
 
@@ -228,15 +289,16 @@ pnpm run build     # Build for production
 
 If ports 2100 or 2200 are in use:
 
-**Server**: Edit `server/src/main.ts` and change the port
+**Server**: Edit `server/.env` and change the `PORT` variable
 **Client**: Edit `client/vite.config.ts` and change the port
 
 ### Database Connection Error
 
 Make sure:
 1. PostgreSQL is running
-2. Database `AI-commerce` exists
-3. User `postgres` with password `postgres` has access
+2. The database specified in `server/.env` exists (default: `dashboard-builder`)
+3. Database credentials in `server/.env` are correct
+4. You've created the `.env` file from `.env.example`
 
 ### Module Not Found
 
