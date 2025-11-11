@@ -1,0 +1,15 @@
+[phases.setup]
+nixPkgs = ["nodejs_18", "corepack"]
+
+[phases.install]
+cmds = [
+  "corepack enable",
+  "corepack prepare pnpm@latest --activate",
+  "pnpm install --frozen-lockfile"
+]
+
+[phases.build]
+cmds = ["pnpm build"]
+
+[start]
+cmd = "caddy file-server --root dist --listen :$PORT"
