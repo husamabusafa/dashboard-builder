@@ -1,4 +1,4 @@
-import type { DashboardState } from './types';
+import type { DashboardState } from '../types/types';
 
 /**
  * Extract all unique grid area names from templateAreas

@@ -1,4 +1,4 @@
-import type { DashboardState } from './types';
+import type { DashboardState } from '../types/types';
 
 type FileHandleWritable = FileSystemFileHandle & { createWritable: () => Promise<FileSystemWritableFileStream> };
 

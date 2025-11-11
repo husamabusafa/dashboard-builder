@@ -7,7 +7,7 @@ import { createDashboardTools } from './DashboardBuilderTools';
 import type { DashboardState } from '../types/types';
 import { ComponentRenderer } from './ComponentRenderer';
 import { EmptyGridArea } from './EmptyGridArea';
-import { saveDashboardVersion, loadLatestDashboard, loadDashboardVersion, hasVersion } from '../utils/opfs';
+import { saveDashboardVersion, loadLatestDashboard } from '../utils/opfs';
 
 const EMPTY_DASHBOARD: DashboardState = {
   grid: {
