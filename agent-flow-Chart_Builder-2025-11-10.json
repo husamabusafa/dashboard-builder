@@ -38,6 +38,7 @@
         "isExpanded": false,
         "agentColor": "#EF4444",
         "modelName": "gpt-5",
+        "apiKeyValue": "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",
         "provider": "openai",
         "apiKeyVariablesMode": false,
         "providerVariablesMode": false,
