@@ -273,8 +273,17 @@ export class DataFetcher {
   ): any {
     try {
       const template = Handlebars.compile(templateConfig.template);
+      
+      // Smart context: flatten single-row results for easier access
+      const isSingleRow = Array.isArray(data) && data.length === 1;
       const context = {
         data,
+        // Add direct field access for single-row results
+        ...(isSingleRow ? data[0] : {}),
+        // Add convenience properties
+        first: Array.isArray(data) && data.length > 0 ? data[0] : null,
+        count: Array.isArray(data) ? data.length : 0,
+        isEmpty: !data || (Array.isArray(data) && data.length === 0),
         ...templateConfig.context,
       };
       
@@ -284,14 +293,19 @@ export class DataFetcher {
       if (typeof result === 'string' && (result.startsWith('{') || result.startsWith('['))) {
         try {
           return JSON.parse(result);
-        } catch {
+        } catch (parseError) {
+          console.warn('Failed to parse template result as JSON:', parseError);
           return result;
         }
       }
       
       return result;
     } catch (error) {
+      const preview = templateConfig.template.length > 100 
+        ? templateConfig.template.substring(0, 100) + '...' 
+        : templateConfig.template;
       console.error('Handlebars template error:', error);
+      console.error('Template preview:', preview);
       throw new Error(`Handlebars template failed: ${error}`);
     }
   }
@@ -434,19 +448,42 @@ export function createStatCardTemplate(options: {
 
 // Register Custom Handlebars Helpers
 
-// Greater than helper
+// Comparison helpers
 Handlebars.registerHelper('gt', function(a: any, b: any) {
   return a > b;
 });
 
-// Less than helper
 Handlebars.registerHelper('lt', function(a: any, b: any) {
   return a < b;
 });
 
-// Equals helper
 Handlebars.registerHelper('eq', function(a: any, b: any) {
   return a === b;
+});
+
+Handlebars.registerHelper('ne', function(a: any, b: any) {
+  return a !== b;
+});
+
+Handlebars.registerHelper('gte', function(a: any, b: any) {
+  return a >= b;
+});
+
+Handlebars.registerHelper('lte', function(a: any, b: any) {
+  return a <= b;
+});
+
+// Logical helpers
+Handlebars.registerHelper('and', function(a: any, b: any) {
+  return a && b;
+});
+
+Handlebars.registerHelper('or', function(a: any, b: any) {
+  return a || b;
+});
+
+Handlebars.registerHelper('not', function(a: any) {
+  return !a;
 });
 
 // Math helpers
@@ -494,4 +531,78 @@ Handlebars.registerHelper('formatDate', function(date: string | Date, format: st
     });
   }
   return d.toISOString();
+});
+
+// Convenience helpers
+Handlebars.registerHelper('first', function(array: any[]) {
+  return Array.isArray(array) && array.length > 0 ? array[0] : null;
+});
+
+Handlebars.registerHelper('last', function(array: any[]) {
+  return Array.isArray(array) && array.length > 0 ? array[array.length - 1] : null;
+});
+
+Handlebars.registerHelper('row', function(array: any[], index: number) {
+  return Array.isArray(array) && index >= 0 && index < array.length ? array[index] : null;
+});
+
+Handlebars.registerHelper('length', function(array: any[]) {
+  return Array.isArray(array) ? array.length : 0;
+});
+
+// Safe property access helper
+Handlebars.registerHelper('get', function(obj: any, path: string, defaultValue: any = '') {
+  if (!obj || !path) return defaultValue;
+  const keys = path.split('.');
+  let result = obj;
+  for (const key of keys) {
+    if (result == null || !(key in result)) return defaultValue;
+    result = result[key];
+  }
+  return result ?? defaultValue;
+});
+
+// JSON helpers
+Handlebars.registerHelper('json', function(obj: any, pretty: boolean = false) {
+  try {
+    return pretty ? JSON.stringify(obj, null, 2) : JSON.stringify(obj);
+  } catch {
+    return '';
+  }
+});
+
+Handlebars.registerHelper('jsonParse', function(str: string) {
+  try {
+    return JSON.parse(str);
+  } catch {
+    return null;
+  }
+});
+
+// String helpers
+Handlebars.registerHelper('uppercase', function(str: string) {
+  return str?.toString().toUpperCase() || '';
+});
+
+Handlebars.registerHelper('lowercase', function(str: string) {
+  return str?.toString().toLowerCase() || '';
+});
+
+Handlebars.registerHelper('capitalize', function(str: string) {
+  const s = str?.toString() || '';
+  return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+});
+
+Handlebars.registerHelper('trim', function(str: string) {
+  return str?.toString().trim() || '';
+});
+
+Handlebars.registerHelper('concat', function(...args: any[]) {
+  // Remove the Handlebars options object (last argument)
+  return args.slice(0, -1).join('');
+});
+
+// Default value helper
+Handlebars.registerHelper('default', function(value: any, defaultValue: any) {
+  return value ?? defaultValue;
 });

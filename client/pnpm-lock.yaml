@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@hsafa/ui-sdk':
-        specifier: ^0.5.0
-        version: 0.5.0(@ai-sdk/react@2.0.90(react@18.3.1)(zod@4.1.12))(@tabler/icons-react@3.35.0(react@18.3.1))(ai@5.0.90(zod@4.1.12))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^0.5.4
+        version: 0.5.4(@tabler/icons-react@3.35.0(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(zod@4.1.12)
       '@iconify/react':
         specifier: ^6.0.2
         version: 6.0.2(react@18.3.1)
@@ -78,32 +78,37 @@ importers:
 
 packages:
 
-  '@ai-sdk/gateway@2.0.7':
-    resolution: {integrity: sha512-/AI5AKi4vOK9SEb8Z1dfXkhsJ5NAfWsoJQc96B/mzn2KIrjw5occOjIwD06scuhV9xWlghCoXJT1sQD9QH/tyg==}
+  '@ai-sdk/gateway@2.0.0-beta.52':
+    resolution: {integrity: sha512-xH1J+Fn7sLjDQVB2XPMsha/gCWUhJ+DvNvLzhbNf7P1XdTRsHY3HMx3xnZLXfaHBXOVCJ+JtAtxS3+3xGa2u2A==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
 
-  '@ai-sdk/provider-utils@3.0.16':
-    resolution: {integrity: sha512-lsWQY9aDXHitw7C1QRYIbVGmgwyT98TF3MfM8alNIXKpdJdi+W782Rzd9f1RyOfgRmZ08gJ2EYNDhWNK7RqpEA==}
+  '@ai-sdk/provider-utils@4.0.0-beta.33':
+    resolution: {integrity: sha512-8UnWOiWP5Fm0X+tU0ne4X3OnbDq5mMMxympHcW5VjVmx+Mc1TgD8KGPl0XsS9l3f61qPSVn1vZC3FthRnTlvhA==}
     engines: {node: '>=18'}
     peerDependencies:
+      '@valibot/to-json-schema': ^1.3.0
+      arktype: ^2.1.22
+      effect: ^3.18.4
       zod: ^3.25.76 || ^4.1.8
+    peerDependenciesMeta:
+      '@valibot/to-json-schema':
+        optional: true
+      arktype:
+        optional: true
+      effect:
+        optional: true
 
-  '@ai-sdk/provider@2.0.0':
-    resolution: {integrity: sha512-6o7Y2SeO9vFKB8lArHXehNuusnpddKPk7xqL7T2/b+OvXMRIXUO1rR4wcv1hAFUAT9avGZshty3Wlua/XA7TvA==}
+  '@ai-sdk/provider@3.0.0-beta.16':
+    resolution: {integrity: sha512-R62Z0fziX467Eu6MtVhkmHm0VFtJrq4vPGo8w4mcc4LhSPncHwn+b9yoyxv3f2pkWyUAhPR4ttgWyZoFG/lXIA==}
     engines: {node: '>=18'}
 
-  '@ai-sdk/react@2.0.90':
-    resolution: {integrity: sha512-t++0a+N7VpbS/HTUD83Ji4aAye+jjOQisEKpVgwdcaY1Z2JRBcQFGXX+aS1HWMSkNMu5HQFG7lPbmQYRyNWcpA==}
+  '@ai-sdk/react@3.0.0-beta.99':
+    resolution: {integrity: sha512-adFSYMZOE+vUmwlebfBVgQu87eOgNVayyD6sx8jRJwVnyMYJc+QRvfDZBsk1+5xyUfMeOlpJZTo3KhkMTZixGw==}
     engines: {node: '>=18'}
     peerDependencies:
       react: ^18 || ^19 || ^19.0.0-rc
-      zod: ^3.25.76 || ^4.1.8
-    peerDependenciesMeta:
-      zod:
-        optional: true
-
   '@antfu/install-pkg@1.1.0':
     resolution: {integrity: sha512-MGQsmw10ZyI+EJo45CdSER4zEb+p31LpDAFp2Z3gkSd1yqVZGi0Ebx++YTEMonJy4oChEMLsxZ64j8FH6sSqtQ==}
 
@@ -367,12 +372,11 @@ packages:
     resolution: {integrity: sha512-d9zaMRSTIKDLhctzH12MtXvJKSSUhaHcjV+2Z+GK+EEY7XKpP5yR4x+N3TAcHTcu963nIr+TMcCb4DBCYX1z6Q==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
 
-  '@hsafa/ui-sdk@0.5.0':
-    resolution: {integrity: sha512-KMgTrR7Yr4LToee67VONdT3fkAbxnprdfFJI17PVz6dPevNycfP0TsQ0vOHYAVcRH73vI62N6b4pnNKsn3cE+A==}
+
+  '@hsafa/ui-sdk@0.5.4':
+    resolution: {integrity: sha512-vXrFcK2VL3SgYlMfC0uir5Frs6z5Q+4ocMxnuHYdP8dvXiOH97PXx65wJqyWVykokG7Ow4iR8es2JonS422xbg==}
     peerDependencies:
-      '@ai-sdk/react': '>=2'
       '@tabler/icons-react': '>=3'
-      ai: '>=5'
       react: '>=18'
       react-dom: '>=18'
 
@@ -871,8 +875,8 @@ packages:
     engines: {node: '>=0.4.0'}
     hasBin: true
 
-  ai@5.0.90:
-    resolution: {integrity: sha512-bawNN10N2cXzFedbDdNUZo8KkcGp12VX1b+mCL5dfllh6WmLsIYYME7GVxsRJvHvPP7xRhuds5fn0jtLyxGnZw==}
+  ai@6.0.0-beta.99:
+    resolution: {integrity: sha512-Z/TQByUwZepN2425FepmvDNNpqVufNtqv1QJju6tGL8uiWLwHc9HKN36+joSuCozeZq9JE77FaQ0TBuRh6Hh/A==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.25.76 || ^4.1.8
@@ -2051,33 +2055,40 @@ packages:
 
 snapshots:
 
-  '@ai-sdk/gateway@2.0.7(zod@4.1.12)':
+  '@ai-sdk/gateway@2.0.0-beta.52(zod@4.1.12)':
     dependencies:
-      '@ai-sdk/provider': 2.0.0
-      '@ai-sdk/provider-utils': 3.0.16(zod@4.1.12)
+      '@ai-sdk/provider': 3.0.0-beta.16
+      '@ai-sdk/provider-utils': 4.0.0-beta.33(zod@4.1.12)
       '@vercel/oidc': 3.0.3
       zod: 4.1.12
+    transitivePeerDependencies:
+      - '@valibot/to-json-schema'
+      - arktype
+      - effect
 
-  '@ai-sdk/provider-utils@3.0.16(zod@4.1.12)':
+  '@ai-sdk/provider-utils@4.0.0-beta.33(zod@4.1.12)':
     dependencies:
-      '@ai-sdk/provider': 2.0.0
+      '@ai-sdk/provider': 3.0.0-beta.16
       '@standard-schema/spec': 1.0.0
       eventsource-parser: 3.0.6
       zod: 4.1.12
 
-  '@ai-sdk/provider@2.0.0':
+  '@ai-sdk/provider@3.0.0-beta.16':
     dependencies:
       json-schema: 0.4.0
 
-  '@ai-sdk/react@2.0.90(react@18.3.1)(zod@4.1.12)':
+  '@ai-sdk/react@3.0.0-beta.99(react@18.3.1)(zod@4.1.12)':
     dependencies:
-      '@ai-sdk/provider-utils': 3.0.16(zod@4.1.12)
-      ai: 5.0.90(zod@4.1.12)
+      '@ai-sdk/provider-utils': 4.0.0-beta.33(zod@4.1.12)
+      ai: 6.0.0-beta.99(zod@4.1.12)
       react: 18.3.1
       swr: 2.3.6(react@18.3.1)
       throttleit: 2.1.0
-    optionalDependencies:
-      zod: 4.1.12
+    transitivePeerDependencies:
+      - '@valibot/to-json-schema'
+      - arktype
+      - effect
+      - zod
 
   '@antfu/install-pkg@1.1.0':
     dependencies:
@@ -2308,19 +2319,22 @@ snapshots:
       - supports-color
 
   '@eslint/js@8.57.1': {}
-
-  '@hsafa/ui-sdk@0.5.0(@ai-sdk/react@2.0.90(react@18.3.1)(zod@4.1.12))(@tabler/icons-react@3.35.0(react@18.3.1))(ai@5.0.90(zod@4.1.12))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+  '@hsafa/ui-sdk@0.5.4(@tabler/icons-react@3.35.0(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)(zod@4.1.12)':
     dependencies:
-      '@ai-sdk/react': 2.0.90(react@18.3.1)(zod@4.1.12)
+      '@ai-sdk/react': 3.0.0-beta.99(react@18.3.1)(zod@4.1.12)
       '@tabler/icons-react': 3.35.0(react@18.3.1)
-      ai: 5.0.90(zod@4.1.12)
+      ai: 6.0.0-beta.99(zod@4.1.12)
       fast-json-patch: 3.1.1
       lucide-react: 0.509.0(react@18.3.1)
       mermaid: 11.12.1
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
     transitivePeerDependencies:
+      - '@valibot/to-json-schema'
+      - arktype
+      - effect
       - supports-color
+      - zod
 
   '@humanwhocodes/config-array@0.13.0':
     dependencies:
@@ -2819,13 +2833,18 @@ snapshots:
 
   acorn@8.15.0: {}
 
-  ai@5.0.90(zod@4.1.12):
+  ai@6.0.0-beta.99(zod@4.1.12):
     dependencies:
-      '@ai-sdk/gateway': 2.0.7(zod@4.1.12)
-      '@ai-sdk/provider': 2.0.0
-      '@ai-sdk/provider-utils': 3.0.16(zod@4.1.12)
+      '@ai-sdk/gateway': 2.0.0-beta.52(zod@4.1.12)
+      '@ai-sdk/provider': 3.0.0-beta.16
+      '@ai-sdk/provider-utils': 4.0.0-beta.33(zod@4.1.12)
       '@opentelemetry/api': 1.9.0
       zod: 4.1.12
+
+    transitivePeerDependencies:
+      - '@valibot/to-json-schema'
+      - arktype
+      - effect
 
   ajv@6.12.6:
     dependencies:
